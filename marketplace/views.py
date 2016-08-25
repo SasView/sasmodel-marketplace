@@ -1,5 +1,8 @@
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.http import Http404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from .models import SasviewModel
 
 def index(request):
@@ -14,5 +17,6 @@ def detail(request, model_id):
         raise Http404("Model does not exist.")
     return render(request, 'marketplace/detail.html', { 'model': model })
 
+@login_required
 def profile(request):
     return render(request, 'registration/profile.html')

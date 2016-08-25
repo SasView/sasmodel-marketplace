@@ -5,6 +5,10 @@
 {% if request.user.is_authenticated %}
     <table class="table">
         <tr>
+            <td>Name:</td>
+            <td>{{ request.user.first_name }} {{ request.user.last_name }}</td>
+        </tr>
+        <tr>
             <td>Username:</td>
             <td>{{ request.user.username }}</td>
         </tr>

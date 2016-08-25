@@ -6,7 +6,7 @@ from . import receivers
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^models/(?P<model_id>[0-9]+)/$', views.detail, name='detail'),
-    url(r'^login/$', auth_views.login, name='login'),
-    url(r'^logout/$', auth_views.logout, { 'next_page': views.index }, name='logout'),
+    url(r'^accounts/login/$', auth_views.login, name='login'),
+    url(r'^accounts/logout/$', auth_views.logout, { 'next_page': views.index }, name='logout'),
     url(r'^accounts/profile/$', views.profile, name='profile'),
 ]

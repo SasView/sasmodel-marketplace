@@ -49,9 +49,7 @@
     <div class="container">
         {% if messages %}
             {% for msg in messages %}
-                <div class="alert alert-{{ msg.tags }}">
-                    {{ msg }}
-                </div>
+                {% bootstrap_alert msg alert_type=msg.tags %}
             {% endfor %}
         {% endif %}
 
