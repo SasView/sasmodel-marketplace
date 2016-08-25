@@ -3,7 +3,7 @@
     - [ ] Create a model page
 - [ ] SasviewModel:
     - [ ] Add file(s) attribute
-    - [ ] DB associations: User -< SasviewModel
+    - [x] DB associations: User -< SasviewModel
     - [ ] Add download_count attribute
     - [ ] Categories?
 - [ ] List all models on index page, sorted by popularity (pagination)
