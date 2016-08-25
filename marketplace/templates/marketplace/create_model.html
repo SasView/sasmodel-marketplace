@@ -2,15 +2,14 @@
 {% load bootstrap3 %}
 {% block content %}
 
-<form class="form" action="{% url 'signup' %}" method="post">
+<form class="form" action="{% url 'create' %}" method="post">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}
         <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "user" %} Create Account
+            Upload Model
         </button>
     {% endbuttons %}
-    <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
 {% endblock content %}

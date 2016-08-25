@@ -1,9 +1,12 @@
 # TODO    
 - [ ] User:
-    - [ ] Create a model page
+    - [x] Create a model page
+    - [ ] List models owned by user on profile page
 - [ ] SasviewModel:
     - [ ] Add file(s) attribute
     - [x] DB associations: User -< SasviewModel
+    - [ ] Add delete button to model page
+    - [ ] Add edit button to model page
     - [ ] Add download_count attribute
     - [ ] Categories?
 - [ ] List all models on index page, sorted by popularity (pagination)
