@@ -2,16 +2,20 @@
 {% load bootstrap3 %}
 {% block content %}
 
-<form class="form" action="{% url 'login' %}" method="post">
+{% if form.errors %}
+    <p>There was an error</p>
+{% endif %}
+
+
+<form class="form" action="{% url 'signup' %}" method="post">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}
         <button type="submit" class="btn btn-primary">
-            {% bootstrap_icon "lock" %} Log In
+            {% bootstrap_icon "user" %} Create Account
         </button>
     {% endbuttons %}
     <input type="hidden" name="next" value="{{ next }}" />
 </form>
-<p>Don't have an account? <a href="{% url 'signup' %}">Sign up!</a>
 
 {% endblock content %}

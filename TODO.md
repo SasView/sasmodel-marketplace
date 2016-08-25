@@ -1,6 +1,5 @@
 # TODO    
 - [ ] User:
-    - [ ] Sign up page
     - [ ] Create a model page
 - [ ] SasviewModel:
     - [ ] Add file(s) attribute
