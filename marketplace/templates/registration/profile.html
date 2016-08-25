@@ -1,0 +1,19 @@
+{% extends 'marketplace/base.html' %}
+
+{% block content %}
+
+{% if request.user.is_authenticated %}
+    <table class="table">
+        <tr>
+            <td>Username:</td>
+            <td>{{ request.user.username }}</td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td>{{ request.user.email }}</td>
+        </tr>
+    </table>
+{% endif %}
+
+
+{% endblock content %}

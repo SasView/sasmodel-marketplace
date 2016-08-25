@@ -13,3 +13,6 @@ def detail(request, model_id):
     except SasviewModel.DoesNotExist:
         raise Http404("Model does not exist.")
     return render(request, 'marketplace/detail.html', { 'model': model })
+
+def profile(request):
+    return render(request, 'registration/profile.html')
