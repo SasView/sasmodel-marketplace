@@ -1,0 +1,11 @@
+<h1>Latest Models</h1>
+{% if latest_models %}
+    <ul>
+        {% for model in latest_models %}
+            <li><a href="{% url 'detail' model.id %}">{{model.name}}</a></li>
+        {% endfor %}
+    </ul>
+
+{% else %}
+    <p>No models yet!</p>
+{% endif %}
