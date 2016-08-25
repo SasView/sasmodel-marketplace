@@ -1,3 +1,6 @@
+{% extends 'marketplace/base.html' %}
+
+{% block content %}
 <h1>Latest Models</h1>
 {% if latest_models %}
     <ul>
@@ -9,3 +12,4 @@
 {% else %}
     <p>No models yet!</p>
 {% endif %}
+{% endblock content %}
