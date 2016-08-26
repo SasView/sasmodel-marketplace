@@ -1,0 +1,19 @@
+{% extends 'marketplace/base.html' %}
+{% load bootstrap3 %}
+{% block content %}
+
+<h2>Edit Model:</h2>
+<form class="form" action="{% url 'edit' model_id=form.instance.id %}" method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">
+            Save Changes
+        </button>
+        <a class="btn btn-danger" href="{% url 'profile' %}">
+            Cancel
+        </a>
+    {% endbuttons %}
+</form>
+
+{% endblock content %}

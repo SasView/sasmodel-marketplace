@@ -8,7 +8,7 @@
         -   If not, upload files
     - [x] DB associations: User -< SasviewModel
     - [ ] Add delete button to model page
-    - [ ] Add edit button to model page
+    - [x] Add edit button to model page
     - [ ] Add download_count attribute
     - [ ] Implement categories
     - [ ] Display description using LaTeX? (mathjax)

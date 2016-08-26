@@ -33,8 +33,25 @@ def create(request):
             return redirect(model)
     else:
         form = SasviewModelForm()
-    return render(request, 'marketplace/create_model.html', { 'form': form })
+    return render(request, 'marketplace/model_create.html', { 'form': form })
 
+@login_required
+def edit(request, model_id):
+    model = get_object_or_404(SasviewModel, pk=model_id)
+    if model.owner != request.user:
+        messages.error(request, "You are not authorized to edit this model.",
+            extra_tags='danger')
+        return redirect('profile')
+
+    form = SasviewModelForm(request.POST or None, instance=model)
+    if request.method == 'POST':
+
+        if form.is_valid():
+            model = form.save()
+            messages.success(request, "Model successfully updated.")
+            return redirect(model)
+
+    return render(request, 'marketplace/model_edit.html', { 'form': form })
 
 # User views
 

@@ -33,10 +33,10 @@
         <tbody>
         {% for model in models %}
             <tr>
-                <td>{{ model.name }}</td>
+                <td><a href="{{ model.get_absolute_url }}">{{ model.name }}</a></td>
                 <td>{{ model.description }}</td>
                 <td>
-                    <a href="#" class="btn btn-primary">Edit</a>
+                    <a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary">Edit</a>
                     <a href="#" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
