@@ -19,7 +19,7 @@ def index(request):
 
 def detail(request, model_id):
     model = get_object_or_404(SasviewModel, pk=model_id)
-    return render(request, 'marketplace/detail.html', { 'model': model })
+    return render(request, 'marketplace/model_detail.html', { 'model': model })
 
 @login_required
 def create(request):
