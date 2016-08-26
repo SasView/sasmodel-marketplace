@@ -1,0 +1,50 @@
+{% extends 'marketplace/base.html' %}
+{% load attachments_tags %}
+
+{% block content %}
+{% get_attachments_for model as model_files %}
+
+<h1>{{ model.name }}</h1>
+
+{% if model_files %}
+
+<h2>Uploaded files:</h2>
+
+<table class="table">
+<thead>
+    <tr>
+        <th>Filename:</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+<tbody>
+    {% for file in model_files %}
+        <tr>
+            <td>{{ file.filename }}</td>
+            <td>
+                <a href="/{{ file.attachment_file.url }}" class="btn btn-primary">Download</a>
+                <a href="{% url 'delete_file' attachment_pk=file.id %}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+    {% endfor %}
+</tbody>
+</table>
+
+{% else %}
+
+<p>No files have been uploaded yet.</p>
+
+{% endif %}
+
+<h2>Upload Files</h2>
+<p>
+    Click "Choose file" then "Add attachment" to upload a file. Click "Done"
+    when you are finished uploading files.
+</p>
+{% attachment_form model %}
+
+<a href="{% url 'detail' model_id=model.id %}" class="btn btn-primary">
+    Done
+</a>
+
+{% endblock content %}

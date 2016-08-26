@@ -43,7 +43,8 @@
 </table>
 
 {% if request.user == model.owner %}
-<a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary">Edit</a>
+<a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary">Edit Details</a>
+<a href="{% url 'edit_files' model_id=model.id %}" class="btn btn-primary">Edit Files</a>
 <button type="button" class="btn btn-danger delete-btn" data-toggle="modal" data-target="#delModal">
   Delete
 </button>
