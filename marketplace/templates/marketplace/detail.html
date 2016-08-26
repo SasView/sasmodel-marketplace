@@ -1,5 +1,11 @@
 {% extends 'marketplace/base.html' %}
 
+{% block head %}
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+{% endblock head %}
+
 {% block content %}
 <h1>{{ model.name }}</h1>
 <p>{{ model.description }}</p>

@@ -8,6 +8,11 @@ class SasviewModelForm(ModelForm):
     class Meta:
         model = SasviewModel
         fields = ("name", "description")
+        help_texts = {
+            'description': ("LaTeX formatting is supported. Use \\(...\\) to"
+                " denote inline maths, and $$...$$ or \\[...\\] to denote"
+                " displayed maths.")
+        }
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField(required=True)
