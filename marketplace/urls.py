@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^models/(?P<model_id>[0-9]+)/$', views.detail, name='detail'),
     url(r'^models/(?P<model_id>[0-9]+)/edit/$', views.edit, name='edit'),
+    url(r'^models/(?P<model_id>[0-9]+)/delete/$', views.delete, name='delete'),
     url(r'^models/create/$', views.create, name='create'),
     url(r'^accounts/signup/$', views.sign_up, name='signup'),
     url(r'^accounts/login/$', auth_views.login, name='login'),

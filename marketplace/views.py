@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import SignupForm
 from .forms import SasviewModelForm
 from .models import SasviewModel
+from .helpers import check_owned_by
 
 def index(request):
     latest_models = SasviewModel.objects.order_by('-upload_date')[:5]
@@ -37,11 +38,9 @@ def create(request):
 
 @login_required
 def edit(request, model_id):
-    model = get_object_or_404(SasviewModel, pk=model_id)
-    if model.owner != request.user:
-        messages.error(request, "You are not authorized to edit this model.",
-            extra_tags='danger')
-        return redirect('profile')
+    model = check_owned_by(request, model_id)
+    if not isinstance(model, SasviewModel):
+        return model
 
     form = SasviewModelForm(request.POST or None, instance=model)
     if request.method == 'POST':
@@ -52,6 +51,15 @@ def edit(request, model_id):
             return redirect(model)
 
     return render(request, 'marketplace/model_edit.html', { 'form': form })
+
+@login_required
+def delete(request, model_id):
+    model = check_owned_by(request, model_id)
+    if not isinstance(model, SasviewModel):
+        return model
+    model.delete()
+    messages.success(request, "Model deleted")
+    return redirect('profile')
 
 # User views
 
