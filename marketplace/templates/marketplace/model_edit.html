@@ -1,5 +1,17 @@
 {% extends 'marketplace/base.html' %}
 {% load bootstrap3 %}
+
+{% block head %}
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<script type="text/javascript">
+    window.MathJax = ({
+        elements: ["model-desc"]
+    });
+</script>
+{% endblock head %}
+
 {% block content %}
 
 <h2>Edit Model:</h2>
@@ -7,6 +19,7 @@
     {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}
+        <a class="btn btn-default" id="preview-btn" href="#preview">Preview</a>
         <button type="submit" class="btn btn-primary">
             Save Changes
         </button>
@@ -15,5 +28,27 @@
         </a>
     {% endbuttons %}
 </form>
+
+<div id="preview" style="display: none;">
+    <h2>Preview:</h2>
+    <div class="well">
+        <h3 id="model-name"></h1>
+        <p id="model-desc"></p>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('#preview').hide();
+    $('#preview-btn').click(function(event) {
+        var modelName = $('#id_name').val();
+        var modelDesc = $('#id_description').val();
+
+        $('#model-name').text(modelName);
+        $('#model-desc').text(modelDesc);
+        $('#preview').show();
+
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    });
+</script>
 
 {% endblock content %}

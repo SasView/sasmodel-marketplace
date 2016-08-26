@@ -4,9 +4,14 @@
 <script type="text/javascript" async
   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
 </script>
+<script type="text/javascript">
+    window.MathJax = ({
+        elements: ["model-desc"]
+    });
+</script>
 {% endblock head %}
 
 {% block content %}
 <h1>{{ model.name }}</h1>
-<p>{{ model.description }}</p>
+<p id="model-desc">{{ model.description }}</p>
 {% endblock content %}
