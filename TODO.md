@@ -1,7 +1,7 @@
 # TODO    
-- [ ] User:
+- [x] User:
     - [x] Create a model page
-    - [ ] List models owned by user on profile page
+    - [x] List models owned by user on profile page
 - [ ] SasviewModel:
     - [ ] Add file(s) attribute - are all models single files?:
         -   If so, upload as text and display syntax-highlighted code

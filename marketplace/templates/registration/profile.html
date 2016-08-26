@@ -1,26 +1,52 @@
 {% extends 'marketplace/base.html' %}
 
 {% block content %}
-
-{% if request.user.is_authenticated %}
-    <table class="table">
-        <tr>
-            <td>Name:</td>
-            <td>{{ request.user.first_name }} {{ request.user.last_name }}</td>
-        </tr>
-        <tr>
-            <td>Username:</td>
-            <td>{{ request.user.username }}</td>
-        </tr>
-        <tr>
-            <td>Email:</td>
-            <td>{{ request.user.email }}</td>
-        </tr>
-    </table>
-{% endif %}
+<h2>Account:</h2>
+<table class="table">
+    <tr>
+        <td>Name:</td>
+        <td>{{ request.user.first_name }} {{ request.user.last_name }}</td>
+    </tr>
+    <tr>
+        <td>Username:</td>
+        <td>{{ request.user.username }}</td>
+    </tr>
+    <tr>
+        <td>Email:</td>
+        <td>{{ request.user.email }}</td>
+    </tr>
+</table>
 <p>
     <a class="btn btn-primary" href="{% url 'password_change' %}">Change Password</a>
 </p>
+
+{% if models %}
+    <h2>My Models:</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for model in models %}
+            <tr>
+                <td>{{ model.name }}</td>
+                <td>{{ model.description }}</td>
+                <td>
+                    <a href="#" class="btn btn-primary">Edit</a>
+                    <a href="#" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+
+{% endif %}
+
 
 
 {% endblock content %}

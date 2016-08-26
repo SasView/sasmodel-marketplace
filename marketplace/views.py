@@ -57,7 +57,8 @@ def sign_up(request):
 
 @login_required
 def profile(request):
-    return render(request, 'registration/profile.html')
+    models = SasviewModel.objects.filter(owner__pk=request.user.id)
+    return render(request, 'registration/profile.html', { 'models': models })
 
 @login_required
 def password_change_done(request):
