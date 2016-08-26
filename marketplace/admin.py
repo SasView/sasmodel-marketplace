@@ -1,5 +1,8 @@
 from django.contrib import admin
 from models import SasviewModel
+from attachments.admin import AttachmentInlines
 
-# Register your models here.
-admin.site.register(SasviewModel)
+class SasviewModelAdmin(admin.ModelAdmin):
+    inlines = (AttachmentInlines,)
+
+admin.site.register(SasviewModel, SasviewModelAdmin)

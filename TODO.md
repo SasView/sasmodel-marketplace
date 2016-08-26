@@ -1,12 +1,11 @@
 # TODO    
+- [ ] UNIT TESTS!!
 - [x] User:
     - [x] Create a model page
     - [x] List models owned by user on profile page
-    - [ ] Allow viewing of other users' profiles
+    - [x] Allow viewing of other users' profiles
 - [ ] SasviewModel:
-    - [ ] Add file(s) attribute - are all models single files?:
-        -   If so, upload as text and display syntax-highlighted code
-        -   If not, upload files
+    - [x] Add files attribute
     - [x] DB associations: User -< SasviewModel
     - [x] Add delete button to model page
     - [x] Add edit button to model page

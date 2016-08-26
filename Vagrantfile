@@ -67,6 +67,6 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y python-pip git python-dev postgresql postgresql-server-dev-9.3
-    pip install django psycopg2 django-bootstrap3
+    pip install django psycopg2 django-bootstrap3 django-attachments
   SHELL
 end

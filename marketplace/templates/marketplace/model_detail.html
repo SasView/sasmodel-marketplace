@@ -1,4 +1,6 @@
 {% extends 'marketplace/base.html' %}
+{% load attachments_tags %}
+{% load debug_tags %}
 
 {% block head %}
 <script type="text/javascript" async
@@ -12,6 +14,7 @@
 {% endblock head %}
 
 {% block content %}
+{% get_attachments_for model as model_files %}
 <h1>{{ model.name }}</h1>
 
 <table class="table">
@@ -27,6 +30,16 @@
         <td><b>Uploaded</b></td>
         <td>{{ model.upload_date }}</td>
     </tr>
+    {% if model_files %}
+    <tr>
+        <td><b>Files</b></td>
+        <td>
+            {% for file in model_files %}
+                <a href="/{{ file.attachment_file.url }}">{{ file.filename }}</a><br />
+            {% endfor %}
+        <td>
+    </tr>
+    {% endif %}
 </table>
 
 {% if request.user == model.owner %}
@@ -63,6 +76,5 @@
     });
 </script>
 {% endif %}
-
 
 {% endblock content %}
