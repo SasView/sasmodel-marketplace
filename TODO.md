@@ -2,6 +2,7 @@
 - [x] User:
     - [x] Create a model page
     - [x] List models owned by user on profile page
+    - [ ] Allow viewing of other users' profiles
 - [ ] SasviewModel:
     - [ ] Add file(s) attribute - are all models single files?:
         -   If so, upload as text and display syntax-highlighted code
@@ -11,7 +12,7 @@
     - [x] Add edit button to model page
     - [ ] Add download_count attribute
     - [ ] Implement categories
-    - [ ] Display description using LaTeX? (mathjax)
+    - [x] Display description using LaTeX? (mathjax)
 - [ ] List all models on index page, sorted by popularity (pagination)
 - [ ] Mail server for password reset
 - [ ] Implement search

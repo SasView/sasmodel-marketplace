@@ -13,5 +13,20 @@
 
 {% block content %}
 <h1>{{ model.name }}</h1>
-<p id="model-desc">{{ model.description }}</p>
+
+<table class="table">
+    <tr>
+        <td><b>Description</b></td>
+        <td id="model-desc">{{ model.description }}</td>
+    </tr>
+    <tr>
+        <td><b>Created By</b></td>
+        <td>{{ model.owner.username }}</td>
+    </tr>
+    <tr>
+        <td><b>Uploaded</b></td>
+        <td>{{ model.upload_date }}</td>
+    </tr>
+</table>
+
 {% endblock content %}
