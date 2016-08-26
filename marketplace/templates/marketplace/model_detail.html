@@ -21,7 +21,7 @@
     </tr>
     <tr>
         <td><b>Created By</b></td>
-        <td>{{ model.owner.username }}</td>
+        <td><a href="{% url 'profile' user_id=model.owner.id %}">{{ model.owner.username }}</a></td>
     </tr>
     <tr>
         <td><b>Uploaded</b></td>

@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .forms import SignupForm
 from .forms import SasviewModelForm
@@ -80,10 +81,10 @@ def sign_up(request):
     return render(request, 'registration/signup.html', { 'form': form })
 
 
-@login_required
-def profile(request):
+def profile(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
     models = SasviewModel.objects.filter(owner__pk=request.user.id)
-    return render(request, 'registration/profile.html', { 'models': models })
+    return render(request, 'registration/profile.html', { 'models': models, 'user': user })
 
 @login_required
 def password_change_done(request):

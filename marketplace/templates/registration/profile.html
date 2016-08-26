@@ -5,29 +5,35 @@
 <table class="table">
     <tr>
         <td>Name:</td>
-        <td>{{ request.user.first_name }} {{ request.user.last_name }}</td>
+        <td>{{ user.first_name }} {{ user.last_name }}</td>
     </tr>
     <tr>
         <td>Username:</td>
-        <td>{{ request.user.username }}</td>
+        <td>{{ user.username }}</td>
     </tr>
+    {% if user == request.user %}
     <tr>
         <td>Email:</td>
-        <td>{{ request.user.email }}</td>
+        <td>{{ user.email }}</td>
     </tr>
+    {% endif %}
 </table>
+{% if user == request.user %}
 <p>
     <a class="btn btn-primary" href="{% url 'password_change' %}">Change Password</a>
 </p>
+{% endif %}
 
 {% if models %}
-    <h2>My Models:</h2>
+    <h2>Models Uploaded by {{ user.username }}:</h2>
     <table class="table">
         <thead>
         <tr>
             <th>Name</th>
             <th>Description</th>
+            {% if user == request.user %}
             <th>Actions</th>
+            {% endif %}
         </tr>
         </thead>
         <tbody>
@@ -35,17 +41,21 @@
             <tr>
                 <td><a href="{{ model.get_absolute_url }}">{{ model.name }}</a></td>
                 <td>{{ model.description }}</td>
+                {% if user == request.user %}
                 <td>
                     <a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary">Edit</a>
                     <button type="button" class="btn btn-danger delete-btn" id="{{ model.id }}" data-toggle="modal" data-target="#delModal">
                       Delete
                     </button>
                 </td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>
 
     </table>
+
+{% if user == request.user %}
 
 <!-- Modal -->
 <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="delModalLabel">
@@ -82,6 +92,7 @@
     });
 </script>
 
+{% endif %}
 {% endif %}
 
 {% endblock content %}
