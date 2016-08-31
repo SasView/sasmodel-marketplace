@@ -1,5 +1,6 @@
 # SasMarket    
-A marketplace website for sharing custom model files for [SasView](https://github.com/SasView/sasview)
+A marketplace website for sharing custom model files for [SasView](https://github.com/SasView/sasview)    
+[![Build Status](https://travis-ci.org/lewisodriscoll/sasmodel-marketplace.svg?branch=master)](https://travis-ci.org/lewisodriscoll/sasmodel-marketplace)    
 
 
 ## Setup    
