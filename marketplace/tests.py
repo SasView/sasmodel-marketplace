@@ -1,3 +1,103 @@
 from django.test import TestCase
+from django.utils import timezone
+from django.urls import reverse
+from django.contrib.auth.models import User
+from marketplace.models import SasviewModel
 
-# Create your tests here.
+def create_model(user, name="Model", desc="Description", commit=True):
+    model = SasviewModel(name=name, description=desc,
+        upload_date=timezone.now(), owner=user)
+    if commit:
+        model.save()
+    return model
+
+def create_user(username=None, email=None, password="testpassword",
+    commit=True, sign_in=False, client=None):
+    if username is None:
+        username = "testuser{}".format(create_user.id)
+        create_user.id += 1
+    if email is None:
+        email = username + "@test.com"
+    user = User(username=username, email=email)
+    user.set_password(password)
+    if commit:
+        user.save()
+    if sign_in:
+        if client is None:
+            raise ValueError("client cannot be None is sign_in is True")
+        client.force_login(user)
+    return user
+create_user.id = 0
+
+
+class SasviewModelTests(TestCase):
+
+    def test_ownership(self):
+        user = create_user()
+        model = create_model(user)
+
+        found_model = SasviewModel.objects.filter(owner__pk=user.id).first()
+        self.assertEqual(model, found_model)
+
+    def test_model_page(self):
+        user = create_user()
+        model = create_model(user, name="My Model")
+
+        response = self.client.get(reverse('detail',
+            kwargs={ 'model_id': model.id }))
+        self.assertContains(response, "My Model")
+        self.assertNotContains(response, "Edit Details")
+        self.assertNotContains(response, "Edit Files")
+        self.assertNotContains(response, "Delete")
+
+        self.client.force_login(user)
+
+        response = self.client.get(reverse('detail',
+            kwargs={ 'model_id': model.id }))
+        self.assertContains(response, "My Model")
+        self.assertContains(response, "Edit Details")
+        self.assertContains(response, "Edit Files")
+        self.assertContains(response, "Delete")
+
+
+class UserTests(TestCase):
+
+    def test_sign_in(self):
+        user = create_user()
+        self.client.post(reverse('login'),
+            { 'username': user.username, 'password': 'testpassword' })
+
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, user.username)
+
+    def test_sign_out(self):
+        user = create_user(sign_in=True, client=self.client)
+        response = self.client.get(reverse('logout'), follow=True)
+        self.assertContains(response, "Log In")
+
+    def test_profile(self):
+        other_user = create_user()
+        current_user = create_user(sign_in=True, client=self.client)
+
+        their_model = create_model(other_user, name="Their Model")
+        my_model = create_model(current_user, name="My Model")
+
+        response1 = self.client.get(reverse('profile', kwargs={ 'user_id': current_user.id }))
+        response2 = self.client.get(reverse('profile'))
+
+        self.assertContains(response1, current_user.email)
+        self.assertContains(response2, current_user.email)
+        self.assertContains(response1, "Change Password")
+        self.assertContains(response2, "Change Password")
+        self.assertContains(response1, "My Model")
+        self.assertContains(response2, "My Model")
+        self.assertNotContains(response1, "Their Model")
+        self.assertNotContains(response2, "Their Model")
+
+        response = self.client.get(reverse('profile',
+            kwargs={ 'user_id': other_user.id }))
+        self.assertContains(response, other_user.username)
+        self.assertNotContains(response, "Change Password")
+        self.assertContains(response, "Their Model")
+        self.assertNotContains(response, "My Model")
