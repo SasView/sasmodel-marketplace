@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
+from django.contrib.postgres.search import SearchVector
 from attachments.models import Attachment
 from .forms import SignupForm
 from .forms import SasviewModelForm
@@ -18,6 +19,16 @@ def index(request):
     latest_models = SasviewModel.objects.order_by('-upload_date')[:5]
     context = { 'latest_models': latest_models }
     return render(request, 'marketplace/index.html', context)
+
+def search(request):
+    if request.method == 'POST' and ('query' in request.POST):
+        query = request.POST['query']
+        results = SasviewModel.objects.annotate(
+            search=SearchVector('name', 'description')).filter(search=query)
+    else:
+        results = []
+    return render(request, 'marketplace/search.html',
+        { 'results': results, 'query': query })
 
 # Model views
 

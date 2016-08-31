@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^models/(?P<model_id>[0-9]+)/files/$', views.edit_files, name='edit_files'),
     url(r'^models/files/(?P<attachment_pk>[0-9]+)/delete/$', views.delete_file, name='delete_file'),
     url(r'^models/create/$', views.create, name='create'),
+    url(r'^search/$', views.search, name='search'),
     url(r'^accounts/signup/$', views.sign_up, name='signup'),
     url(r'^accounts/login/$', auth_views.login, name='login'),
     url(r'^accounts/logout/$', auth_views.logout, { 'next_page': views.index }, name='logout'),

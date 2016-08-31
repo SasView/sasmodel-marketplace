@@ -6,13 +6,6 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from marketplace.models import SasviewModel
 from marketplace.views import edit, delete
 
-def create_model(user, name="Model", desc="Description", commit=True):
-    model = SasviewModel(name=name, description=desc,
-        upload_date=timezone.now(), owner=user)
-    if commit:
-        model.save()
-    return model
-
 def create_user(username=None, email=None, password="testpassword",
     commit=True, sign_in=False, client=None):
     if username is None:
@@ -31,19 +24,28 @@ def create_user(username=None, email=None, password="testpassword",
     return user
 create_user.id = 0
 
+def create_model(user=None, name="Model", desc="Description", commit=True):
+    if user is None:
+        user = create_user()
+    model = SasviewModel(name=name, description=desc,
+        upload_date=timezone.now(), owner=user)
+    if commit:
+        model.save()
+    return model
+
 
 class SasviewModelTests(TestCase):
 
     def test_ownership(self):
-        user = create_user()
-        model = create_model(user)
+        owner = create_user()
+        model = create_model(user=owner)
 
-        found_model = SasviewModel.objects.filter(owner__pk=user.id).first()
+        found_model = SasviewModel.objects.filter(owner__pk=owner.id).first()
         self.assertEqual(model, found_model)
 
     def test_model_page(self):
         user = create_user()
-        model = create_model(user, name="My Model")
+        model = create_model(user=user, name="My Model")
 
         response = self.client.get(reverse('detail',
             kwargs={ 'model_id': model.id }))
@@ -65,7 +67,7 @@ class SasviewModelTests(TestCase):
         factory = RequestFactory()
         owner = create_user()
         current = create_user(sign_in=True, client=self.client)
-        model = create_model(owner)
+        model = create_model(user=owner)
 
         request = factory.get('/models/{}/edit/'.format(model.id))
         setattr(request, 'session', 'session')
@@ -86,7 +88,7 @@ class SasviewModelTests(TestCase):
         factory = RequestFactory()
         owner = create_user()
         current = create_user(sign_in=True, client=self.client)
-        model = create_model(owner)
+        model = create_model(user=owner)
 
         request = factory.get('/models/{}/delete/'.format(model.id))
         setattr(request, 'session', 'session')
@@ -107,6 +109,11 @@ class SasviewModelTests(TestCase):
         response = delete(request, model.id)
         self.assertRedirects(response, reverse('profile'),
             fetch_redirect_response=False)
+
+    def test_search(self):
+        model = create_model(name="Adsorbed Layer")
+        response = self.client.post(reverse('search'), { 'query': 'layer' })
+        self.assertContains(response, "Adsorbed Layer")
 
 
 

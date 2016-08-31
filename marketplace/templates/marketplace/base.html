@@ -45,9 +45,14 @@
                     {% else %}
                         <li><a href="{% url 'login' %}">{% bootstrap_icon "log-in" %} Log In </a></li>
                     {% endif %}
-
-
                 </ul>
+                <form class="navbar-form navbar-left" action="{% url 'search' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" name="query" class="form-control" placeholder="Search" {% if query %}value="{{ query }}"{% endif %}>
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
             </div><!-- /.navbar-collapse -->
         </div>
     </nav>

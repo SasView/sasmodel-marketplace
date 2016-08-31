@@ -1,0 +1,28 @@
+{% extends 'marketplace/base.html' %}
+
+{% block content %}
+<h1>Search</h1>
+
+{% if results and query %}
+<p>
+    Your search for {{ query }} returned the following results:
+</p>
+
+<ol>
+    {% for model in results %}
+    <li><a href="{% url 'detail' model.id %}">{{ model.name }}</a></li>
+    {% endfor %}
+</ol>
+{% elif query %}
+<p>
+    Your search for "{{ query }}" returned no results.
+</p>
+{% else %}
+<p>
+    Please enter a search query above.
+</p>
+{% endif %}
+
+
+
+{% endblock content %}

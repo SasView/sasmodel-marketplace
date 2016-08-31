@@ -16,11 +16,16 @@
 {% get_attachments_for model as model_files %}
 <h1>{{ model.name }}</h1>
 
+<h2>Description:</h2>
+<div id="model-desc" class="container">
+    <p>
+        {{ model.description|linebreaks }}
+    </p>
+</div>
+
+
+<h2>Details:</h2>
 <table class="table">
-    <tr>
-        <td><b>Description</b></td>
-        <td id="model-desc">{{ model.description }}</td>
-    </tr>
     <tr>
         <td><b>Created By</b></td>
         <td><a href="{% url 'profile' user_id=model.owner.id %}">{{ model.owner.username }}</a></td>
@@ -29,16 +34,18 @@
         <td><b>Uploaded</b></td>
         <td>{{ model.upload_date }}</td>
     </tr>
-    {% if model_files %}
     <tr>
         <td><b>Files</b></td>
         <td>
-            {% for file in model_files %}
+            {% if model_files %}
+                {% for file in model_files %}
                 <a href="/{{ file.attachment_file.url }}">{{ file.filename }}</a><br />
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                No files uploaded yet.
+            {% endif %}
         <td>
     </tr>
-    {% endif %}
 </table>
 
 {% if request.user == model.owner %}
