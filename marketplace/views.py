@@ -117,7 +117,7 @@ def profile(request, user_id=None):
     if user_id is None:
         user_id = request.user.id
     user = get_object_or_404(User, pk=user_id)
-    models = SasviewModel.objects.filter(owner__pk=request.user.id)
+    models = SasviewModel.objects.filter(owner__pk=user.id)
     return render(request, 'registration/profile.html', { 'models': models, 'user': user })
 
 @login_required
