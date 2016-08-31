@@ -1,6 +1,5 @@
 # TODO    
-- [ ] UNIT TESTS!!
-- [ ] Fix collapsed menu not working
+- [x] Fix collapsed menu not working
 - [ ] SasviewModel:
     - [ ] Add download_count attribute and/or rating system (in order to sort models by popularity)
     - [ ] Implement categories
