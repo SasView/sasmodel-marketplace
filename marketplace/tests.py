@@ -43,7 +43,55 @@ class SasviewModelTests(TestCase):
         found_model = SasviewModel.objects.filter(owner__pk=owner.id).first()
         self.assertEqual(model, found_model)
 
-    def test_model_page(self):
+    def test_search(self):
+        model = create_model(name="Adsorbed Layer")
+        response = self.client.post(reverse('search'), { 'query': 'layer' })
+        self.assertContains(response, "Adsorbed Layer")
+
+
+class UserTests(TestCase):
+
+    def test_sign_in(self):
+        user = create_user()
+        self.client.post(reverse('login'),
+            { 'username': user.username, 'password': 'testpassword' })
+
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, user.username)
+
+    def test_sign_out(self):
+        user = create_user(sign_in=True, client=self.client)
+        response = self.client.get(reverse('logout'), follow=True)
+        self.assertContains(response, "Log In")
+
+    def test_profile_permissions(self):
+        other_user = create_user()
+        current_user = create_user(sign_in=True, client=self.client)
+
+        their_model = create_model(other_user, name="Their Model")
+        my_model = create_model(current_user, name="My Model")
+
+        response1 = self.client.get(reverse('profile', kwargs={ 'user_id': current_user.id }))
+        response2 = self.client.get(reverse('profile'))
+
+        self.assertContains(response1, current_user.email)
+        self.assertContains(response2, current_user.email)
+        self.assertContains(response1, "Change Password")
+        self.assertContains(response2, "Change Password")
+        self.assertContains(response1, "My Model")
+        self.assertContains(response2, "My Model")
+        self.assertNotContains(response1, "Their Model")
+        self.assertNotContains(response2, "Their Model")
+
+        response = self.client.get(reverse('profile',
+            kwargs={ 'user_id': other_user.id }))
+        self.assertContains(response, other_user.username)
+        self.assertNotContains(response, "Change Password")
+        self.assertContains(response, "Their Model")
+        self.assertNotContains(response, "My Model")
+
+    def test_model_detail_permissions(self):
         user = create_user()
         model = create_model(user=user, name="My Model")
 
@@ -109,52 +157,3 @@ class SasviewModelTests(TestCase):
         response = delete(request, model.id)
         self.assertRedirects(response, reverse('profile'),
             fetch_redirect_response=False)
-
-    def test_search(self):
-        model = create_model(name="Adsorbed Layer")
-        response = self.client.post(reverse('search'), { 'query': 'layer' })
-        self.assertContains(response, "Adsorbed Layer")
-
-
-
-class UserTests(TestCase):
-
-    def test_sign_in(self):
-        user = create_user()
-        self.client.post(reverse('login'),
-            { 'username': user.username, 'password': 'testpassword' })
-
-        response = self.client.get(reverse('index'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, user.username)
-
-    def test_sign_out(self):
-        user = create_user(sign_in=True, client=self.client)
-        response = self.client.get(reverse('logout'), follow=True)
-        self.assertContains(response, "Log In")
-
-    def test_profile(self):
-        other_user = create_user()
-        current_user = create_user(sign_in=True, client=self.client)
-
-        their_model = create_model(other_user, name="Their Model")
-        my_model = create_model(current_user, name="My Model")
-
-        response1 = self.client.get(reverse('profile', kwargs={ 'user_id': current_user.id }))
-        response2 = self.client.get(reverse('profile'))
-
-        self.assertContains(response1, current_user.email)
-        self.assertContains(response2, current_user.email)
-        self.assertContains(response1, "Change Password")
-        self.assertContains(response2, "Change Password")
-        self.assertContains(response1, "My Model")
-        self.assertContains(response2, "My Model")
-        self.assertNotContains(response1, "Their Model")
-        self.assertNotContains(response2, "Their Model")
-
-        response = self.client.get(reverse('profile',
-            kwargs={ 'user_id': other_user.id }))
-        self.assertContains(response, other_user.username)
-        self.assertNotContains(response, "Change Password")
-        self.assertContains(response, "Their Model")
-        self.assertNotContains(response, "My Model")
