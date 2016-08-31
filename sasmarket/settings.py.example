@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
     'bootstrap3',
-    'attachments',
 ]
 
 MIDDLEWARE = [
@@ -86,6 +85,14 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PORT': '5432'
     }
+}
+
+DB_FILES = {
+    'db_table': 'marketplace_uploaded_files',
+    'fname_column': 'file_name',
+    'blob_column': 'blob',
+    'size_column': 'size',
+    'base_url': 'http://localhost:8000/uploads/'
 }
 
 

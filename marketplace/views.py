@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import login
@@ -11,6 +12,7 @@ from .forms import SignupForm
 from .forms import SasviewModelForm
 from .models import SasviewModel
 from .helpers import check_owned_by
+from .backends.database import DatabaseStorage
 
 def index(request):
     latest_models = SasviewModel.objects.order_by('-upload_date')[:5]
@@ -26,6 +28,16 @@ def search(request):
         results = []
     return render(request, 'marketplace/search.html',
         { 'results': results, 'query': query })
+
+def show_file(request, filename):
+    storage = DatabaseStorage()
+    try:
+        model_file = storage.open(filename, 'rb')
+        file_content = model_file.read()
+    except Exception as e:
+        file_content = str(e)
+    res = HttpResponse(file_content, content_type="text/text")
+    return res
 
 # Model views
 

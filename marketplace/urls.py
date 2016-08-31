@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^models/(?P<model_id>[0-9]+)/delete/$', views.delete, name='delete'),
     url(r'^models/create/$', views.create, name='create'),
     url(r'^search/$', views.search, name='search'),
+    url(r'^uploads/(?P<filename>.*)$', views.show_file, name='show_file'),
     url(r'^accounts/signup/$', views.sign_up, name='signup'),
     url(r'^accounts/login/$', auth_views.login, name='login'),
     url(r'^accounts/logout/$', auth_views.logout, { 'next_page': views.index }, name='logout'),

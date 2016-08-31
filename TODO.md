@@ -1,5 +1,9 @@
 # TODO    
-- [x] Fix collapsed menu not working
+- [ ] File storage:
+    - [ ] Create separate model for file:
+        - Store actual file name as well as path to file in DB
+        - User has many files
+    - [ ] Allow uploading multiple files
 - [ ] SasviewModel:
     - [ ] Add download_count attribute and/or rating system (in order to sort models by popularity)
     - [ ] Implement categories

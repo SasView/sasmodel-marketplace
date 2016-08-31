@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
+from .backends.database import DatabaseStorage
 
 @python_2_unicode_compatible
 class SasviewModel(models.Model):
@@ -9,6 +10,7 @@ class SasviewModel(models.Model):
     description = models.TextField()
     upload_date = models.DateTimeField('date published')
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    model_file = models.FileField(upload_to='uploaded_models', storage=DatabaseStorage())
 
     def __str__(self):
         return self.name
