@@ -20,9 +20,4 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'', include('marketplace.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'^attachments/', include('attachments.urls', namespace='attachments')),
 ]
-
-from . import settings
-if settings.DEBUG:
-    urlpatterns += static('/', document_root='') # Serve attachments

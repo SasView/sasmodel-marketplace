@@ -1,5 +1,4 @@
 {% extends 'marketplace/base.html' %}
-{% load attachments_tags %}
 
 {% block head %}
 <script type="text/javascript" async
@@ -13,7 +12,6 @@
 {% endblock head %}
 
 {% block content %}
-{% get_attachments_for model as model_files %}
 <h1>{{ model.name }}</h1>
 
 <h2>Description:</h2>
@@ -36,21 +34,12 @@
     </tr>
     <tr>
         <td><b>Files</b></td>
-        <td>
-            {% if model_files %}
-                {% for file in model_files %}
-                <a href="/{{ file.attachment_file.url }}">{{ file.filename }}</a><br />
-                {% endfor %}
-            {% else %}
-                No files uploaded yet.
-            {% endif %}
-        <td>
+        <td>No files uploaded yet.<td>
     </tr>
 </table>
 
 {% if request.user == model.owner %}
 <a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary">Edit Details</a>
-<a href="{% url 'edit_files' model_id=model.id %}" class="btn btn-primary">Edit Files</a>
 <button type="button" class="btn btn-danger delete-btn" data-toggle="modal" data-target="#delModal">
   Delete
 </button>

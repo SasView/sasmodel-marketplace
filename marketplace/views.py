@@ -5,11 +5,8 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchVector
-from attachments.models import Attachment
 from .forms import SignupForm
 from .forms import SasviewModelForm
 from .models import SasviewModel
@@ -46,7 +43,7 @@ def create(request):
             model.upload_date = timezone.now()
             model.save()
             messages.success(request, "Model successfully created.")
-            return redirect('edit_files', model_id=model.id)
+            return redirect('detail', model_id=model.id)
     else:
         form = SasviewModelForm()
     return render(request, 'marketplace/model_create.html', { 'form': form })
@@ -76,30 +73,6 @@ def delete(request, model_id):
     messages.success(request, "Model deleted")
     return redirect('profile')
 
-@login_required
-def edit_files(request, model_id):
-    model = check_owned_by(request, model_id)
-    if not isinstance(model, SasviewModel):
-        return model
-    return render(request, 'marketplace/model_files.html', { 'model': model })
-
-@login_required
-def delete_file(request, attachment_pk):
-    g = get_object_or_404(Attachment, pk=attachment_pk)
-    if (
-        (request.user.has_perm('attachments.delete_attachment') and
-        request.user == g.creator)
-    or
-        request.user.has_perm('attachments.delete_foreign_attachments')
-    ):
-        g.delete()
-        messages.success(request, "Your attachment was deleted.")
-    else:
-        messages.error(request, "You don't have permission to delete this file.",
-            extra_tags='danger')
-    model = g.content_object
-    return redirect('edit_files', model_id=model.id)
-
 # User views
 
 def sign_up(request):
@@ -111,11 +84,6 @@ def sign_up(request):
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
-            content_type = ContentType.objects.get_for_model(Attachment)
-            user.user_permissions.add(Permission.objects.get(content_type=content_type,
-                codename='add_attachment'))
-            user.user_permissions.add(Permission.objects.get(content_type=content_type,
-                codename='delete_attachment'))
             login(request, user)
             messages.info(request, 'Account created successfully.')
             return redirect('profile')
