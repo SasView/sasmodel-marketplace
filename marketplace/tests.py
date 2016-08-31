@@ -1,8 +1,10 @@
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.contrib.messages.storage.fallback import FallbackStorage
 from marketplace.models import SasviewModel
+from marketplace.views import edit, delete
 
 def create_model(user, name="Model", desc="Description", commit=True):
     model = SasviewModel(name=name, description=desc,
@@ -58,6 +60,54 @@ class SasviewModelTests(TestCase):
         self.assertContains(response, "Edit Details")
         self.assertContains(response, "Edit Files")
         self.assertContains(response, "Delete")
+
+    def test_edit_permissions(self):
+        factory = RequestFactory()
+        owner = create_user()
+        current = create_user(sign_in=True, client=self.client)
+        model = create_model(owner)
+
+        request = factory.get('/models/{}/edit/'.format(model.id))
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        request.user = current
+        response = edit(request, model_id=model.id)
+        self.assertRedirects(response, reverse('detail',
+            kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
+
+        self.client.force_login(owner)
+
+        response = self.client.get(reverse('edit',
+            kwargs={ 'model_id': model.id }), follow=True)
+        self.assertContains(response, "Edit")
+
+    def test_delete_permissions(self):
+        factory = RequestFactory()
+        owner = create_user()
+        current = create_user(sign_in=True, client=self.client)
+        model = create_model(owner)
+
+        request = factory.get('/models/{}/delete/'.format(model.id))
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        request.user = current
+        response = edit(request, model_id=model.id)
+        self.assertRedirects(response, reverse('detail',
+            kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
+
+        self.client.force_login(owner)
+
+        request = factory.get('/models/{}/delete/'.format(model.id))
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        request.user = owner
+        response = delete(request, model.id)
+        self.assertRedirects(response, reverse('profile'),
+            fetch_redirect_response=False)
+
 
 
 class UserTests(TestCase):
