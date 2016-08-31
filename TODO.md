@@ -1,18 +1,10 @@
 # TODO    
 - [ ] UNIT TESTS!!
-- [x] User:
-    - [x] Create a model page
-    - [x] List models owned by user on profile page
-    - [x] Allow viewing of other users' profiles
+- [ ] Fix collapsed menu not working
 - [ ] SasviewModel:
-    - [x] Add files attribute
-    - [x] DB associations: User -< SasviewModel
-    - [x] Add delete button to model page
-    - [x] Add edit button to model page
-    - [ ] Add download_count attribute
+    - [ ] Add download_count attribute and/or rating system (in order to sort models by popularity)
     - [ ] Implement categories
-    - [x] Display description using LaTeX? (mathjax)
-- [ ] List all models on index page, sorted by popularity (pagination)
+- [ ] List all models on index page (implement pagination)
 - [ ] Mail server for password reset
 - [ ] Implement search
 - [ ] Allow commenting on models
