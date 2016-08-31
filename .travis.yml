@@ -4,6 +4,6 @@ python:
 services:
     - postgresql
 before_script:
-    - psql -c 'create database test_marketplace;' -U postgres
+    - cp sasmarket/settings.py.example sasmarket/settings.py
 install: "pip install -r requirements.txt"
-script: sh travis_test.sh
+script: python manage.py test marketplace
