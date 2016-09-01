@@ -8,6 +8,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchVector
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import SignupForm
 from .forms import SasviewModelForm
 from .forms import ModelFileForm
@@ -22,12 +23,24 @@ def index(request):
     return render(request, 'marketplace/index.html', context)
 
 def search(request):
-    if request.method == 'POST' and ('query' in request.POST):
-        query = request.POST['query']
-        results = SasviewModel.objects.annotate(
+    query = None
+    if request.method == 'GET' and ('query' in request.GET):
+        query = request.GET['query']
+        result_list = SasviewModel.objects.annotate(
             search=SearchVector('name', 'description')).filter(search=query)
     else:
-        results = []
+        result_list = []
+
+    paginator = Paginator(result_list, 15)
+    page = request.GET.get('page')
+    try:
+        results = paginator.page(page)
+    except PageNotAnInteger:
+        results = paginator.page(1)
+    except EmptyPage:
+        # Page is out of range
+        results = paginator.page(paginator.num_pages)
+
     return render(request, 'marketplace/search.html',
         { 'results': results, 'query': query })
 

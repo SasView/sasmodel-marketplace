@@ -57,7 +57,7 @@ class SasviewModelTests(TestCase):
 
     def test_search(self):
         model = create_model(name="Adsorbed Layer")
-        response = self.client.post(reverse('search'), { 'query': 'layer' })
+        response = self.client.get(reverse('search'), { 'query': 'layer' })
         self.assertContains(response, "Adsorbed Layer")
 
     def test_cascade_deletion(self):
