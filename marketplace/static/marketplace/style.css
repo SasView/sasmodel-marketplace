@@ -9,3 +9,8 @@ body {
 .btn-edit {
     margin: 2px 0 2px 0;
 }
+
+.model-name {
+    font-size: 18pt;
+    min-width: 150px;
+}

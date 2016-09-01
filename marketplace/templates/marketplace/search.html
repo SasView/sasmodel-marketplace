@@ -1,5 +1,21 @@
 {% extends 'marketplace/base.html' %}
 
+{% block head %}
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<script type="text/javascript">
+    window.MathJax = ({
+        elements: ["model-desc"],
+        tex2jax: {
+            // Dislay all LaTeX as inline
+            inlineMath: [ ['$', '$'], [ "\\(", "\\)" ], [ "\\[", "\\]" ], [ "$$", "$$" ] ],
+            processEscapes: true
+        }
+    });
+</script>
+{% endblock head %}
+
 {% block content %}
 <h1>Search</h1>
 
@@ -8,9 +24,12 @@
     Your search for {{ query }} returned the following results:
 </p>
 
-<ol>
+<table class="table search-results">
     {% for model in results %}
-    <li><a href="{% url 'detail' model.id %}">{{ model.name }}</a></li>
+    <tr>
+        <td class="model-name"><a href="{% url 'detail' model.id %}">{{ model.name }}</a></td>
+        <td id="model-desc">{{ model.description|truncatechars:200 }}</td>
+    </tr>
     {% endfor %}
 </ol>
 {% elif query %}
