@@ -1,9 +1,12 @@
 from django import forms
 from django.forms import ModelForm
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.template.defaultfilters import filesizeformat
 from .models import SasviewModel
 from .models import ModelFile
+import magic
 
 class SasviewModelForm(ModelForm):
     class Meta:
@@ -15,7 +18,31 @@ class SasviewModelForm(ModelForm):
                 " displayed maths.")
         }
 
+class ModelFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        self.mimetypes = kwargs.pop('mimetypes')
+        self.max_size = kwargs.pop('max_size')
+        super(ModelFileField, self).__init__(*args, **kwargs)
+
+    def clean(self, *args, **kwargs):
+        data = super(ModelFileField, self).clean(*args, **kwargs)
+        content_type = magic.from_buffer(data.read(), mime=True)
+        data.seek(0)
+        if self.mimetypes is not None and content_type not in self.mimetypes:
+            raise ValidationError(
+                ("Files of type %(content_type)s cannot be uploaded. Please select a C file or Python script."),
+                params={ 'content_type': content_type }
+            )
+        if self.max_size is not None and data.size > self.max_size:
+            raise ValidationError(
+                ("Files must be smaller than %(file_size)s."),
+                params={ 'file_size': filesizeformat(self.max_size) }
+            )
+        return data
+
 class ModelFileForm(ModelForm):
+    model_file = ModelFileField(allow_empty_file=False,
+        mimetypes=["text/x-c", "text/x-python"], max_size=20*2**10)
     class Meta:
         model = ModelFile
         fields = ("model_file",)
