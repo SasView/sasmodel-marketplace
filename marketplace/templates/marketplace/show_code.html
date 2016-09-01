@@ -1,0 +1,20 @@
+{% extends 'marketplace/base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'marketplace/tomorrow-night.css' %}">
+<script src="{% static 'marketplace/highlight.pack.js' %}"></script>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+</script>
+{% endblock head %}
+
+{% block content %}
+<h1>{{ file_object.name }}</h1>
+<pre>
+    <code>{{ file_content }}</code>
+</pre>
+
+<a class="btn btn-primary" href="{{ file_object.model_file.url }}" target="_blank">Download</a>
+
+{% endblock content %}

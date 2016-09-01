@@ -12,8 +12,6 @@ class SasviewModel(models.Model):
     description = models.TextField()
     upload_date = models.DateTimeField('date published')
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    model_file = models.FileField(upload_to='uploaded_models',
-        storage=DatabaseStorage())
 
     def __str__(self):
         return self.name
@@ -21,7 +19,21 @@ class SasviewModel(models.Model):
     def get_absolute_url(self):
         return reverse('detail', kwargs={'model_id': self.id})
 
+@python_2_unicode_compatible
+class ModelFile(models.Model):
+    name = models.CharField(max_length=100)
+    model_file = models.FileField(upload_to='uploaded_models',
+        storage=DatabaseStorage())
+    model = models.ForeignKey(SasviewModel, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
 @receiver(pre_delete)
 def delete_file(sender, instance, **kwargs):
     if sender == SasviewModel:
+        files = ModelFile.objects.filter(model__pk=instance.id)
+        for f in files:
+            f.delete()
+    elif sender == ModelFile:
         instance.model_file.delete()

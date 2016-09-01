@@ -11,6 +11,7 @@ from django.contrib.postgres.search import SearchVector
 from .forms import SignupForm
 from .forms import SasviewModelForm
 from .models import SasviewModel
+from .models import ModelFile
 from .helpers import check_owned_by
 from .backends.database import DatabaseStorage
 
@@ -29,21 +30,30 @@ def search(request):
     return render(request, 'marketplace/search.html',
         { 'results': results, 'query': query })
 
-def show_file(request, filename):
+def show_file(request, file_id):
+    model_file = get_object_or_404(ModelFile, pk=file_id)
+    file_content = model_file.model_file.read()
+
+    return render(request, 'marketplace/show_code.html',
+        { 'file_object': model_file, 'file_content': file_content })
+
+def download_file(request, filename):
     storage = DatabaseStorage()
     try:
         model_file = storage.open(filename, 'rb')
         file_content = model_file.read()
     except Exception as e:
         file_content = str(e)
-    res = HttpResponse(file_content, content_type="text/text")
+    res = HttpResponse(file_content, content_type="application/force_download")
     return res
 
 # Model views
 
 def detail(request, model_id):
     model = get_object_or_404(SasviewModel, pk=model_id)
-    return render(request, 'marketplace/model_detail.html', { 'model': model })
+    files = ModelFile.objects.filter(model__pk=model.id)
+    return render(request, 'marketplace/model_detail.html',
+        { 'model': model, 'files': files })
 
 @login_required
 def create(request):

@@ -6,7 +6,11 @@
 </script>
 <script type="text/javascript">
     window.MathJax = ({
-        elements: ["model-desc"]
+        elements: ["model-desc"],
+        tex2jax: {
+            inlineMath: [ ['$', '$'], [ "\\(", "\\)" ] ],
+            processEscapes: true
+        }
     });
 </script>
 {% endblock head %}
@@ -34,7 +38,16 @@
     </tr>
     <tr>
         <td><b>Files</b></td>
-        <td>No files uploaded yet.<td>
+        <td>
+            {% if files %}
+            {% for f in files %}
+                <a href="{% url 'show_file' file_id=f.id %}">{{ f.name }}</a><br />
+            {% endfor %}
+
+            {% else %}
+            No files uploaded yet.
+            {% endif %}
+        </td>
     </tr>
 </table>
 

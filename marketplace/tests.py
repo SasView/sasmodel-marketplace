@@ -3,7 +3,8 @@ from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
-from marketplace.models import SasviewModel
+from django.core.files.uploadedfile import SimpleUploadedFile
+from marketplace.models import SasviewModel, ModelFile
 from marketplace.views import edit, delete
 
 def create_user(username=None, email=None, password="testpassword",
@@ -33,6 +34,17 @@ def create_model(user=None, name="Model", desc="Description", commit=True):
         model.save()
     return model
 
+def create_file(model=None, name='model_name.py', commit=True):
+    if model is None:
+        model = create_model()
+    f = SimpleUploadedFile(name, 'class MyModel(Model):\n  def__init__(self):\n    print("init")')
+    model_file = ModelFile(name=name, model=model, model_file=f)
+
+    if commit:
+        model_file.save()
+
+    return model_file
+
 
 class SasviewModelTests(TestCase):
 
@@ -59,6 +71,27 @@ class SasviewModelTests(TestCase):
         user.delete()
         all_models = SasviewModel.objects.all()
         self.assertEqual(len(all_models), 0)
+
+class ModelFileTests(TestCase):
+
+    def test_owndership(self):
+        model = create_model()
+        model_file = create_file(model=model)
+
+        found_file = ModelFile.objects.filter(model__pk=model.id).first()
+        self.assertEqual(model_file, found_file)
+
+    def test_cascade_deletion(self):
+        model = create_model()
+        file1 = create_file(model=model, name='file_one.py')
+        file2 = create_file(model=model, name='file_two.py')
+
+        all_files = ModelFile.objects.all()
+        self.assertEqual(len(all_files), 2)
+
+        model.delete()
+        all_files = ModelFile.objects.all()
+        self.assertEqual(len(all_files), 0)
 
 
 class UserTests(TestCase):
