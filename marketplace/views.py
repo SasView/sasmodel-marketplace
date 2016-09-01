@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchVector
 from .forms import SignupForm
 from .forms import SasviewModelForm
+from .forms import ModelFileForm
 from .models import SasviewModel
 from .models import ModelFile
 from .helpers import check_owned_by
@@ -29,29 +30,6 @@ def search(request):
         results = []
     return render(request, 'marketplace/search.html',
         { 'results': results, 'query': query })
-
-def show_file(request, file_id):
-    model_file = get_object_or_404(ModelFile, pk=file_id)
-    file_content = model_file.model_file.read()
-
-    try:
-        res = render(request, 'marketplace/show_code.html',
-            { 'file_object': model_file, 'file_content': file_content })
-    except:
-        res = render(request, 'marketplace/show_code.html',
-            { 'file_object': model_file })
-
-    return res
-
-def download_file(request, filename):
-    storage = DatabaseStorage()
-    try:
-        model_file = storage.open(filename, 'rb')
-        file_content = model_file.read()
-    except Exception as e:
-        file_content = str(e)
-    res = HttpResponse(file_content, content_type="application/force_download")
-    return res
 
 # Model views
 
@@ -100,6 +78,53 @@ def delete(request, model_id):
     model.delete()
     messages.success(request, "Model deleted")
     return redirect('profile')
+
+# Model file views
+
+def show_file(request, file_id):
+    model_file = get_object_or_404(ModelFile, pk=file_id)
+    file_content = model_file.model_file.read()
+
+    try:
+        res = render(request, 'marketplace/show_code.html',
+            { 'file_object': model_file, 'file_content': file_content })
+    except:
+        res = render(request, 'marketplace/show_code.html',
+            { 'file_object': model_file })
+
+    return res
+
+def download_file(request, filename):
+    storage = DatabaseStorage()
+    try:
+        model_file = storage.open(filename, 'rb')
+        file_content = model_file.read()
+    except Exception as e:
+        file_content = str(e)
+    res = HttpResponse(file_content, content_type="application/force_download")
+    return res
+
+@login_required
+def edit_files(request, model_id):
+    model = check_owned_by(request, model_id)
+    if not isinstance(model, SasviewModel):
+        return model
+    files = ModelFile.objects.filter(model__id=model.id)
+    form = ModelFileForm()
+
+    if request.method == 'POST':
+        form = ModelFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            model_file = form.save(commit=False)
+            print(form.data)
+            model_file.name = request.FILES['model_file'].name
+            model_file.model = model
+            model_file.save()
+            messages.success(request, 'Model file successfully added.')
+            return redirect('edit_files', model_id=model_id)
+    return render(request, 'marketplace/model_file_edit.html',
+        { 'model': model, 'files': files, 'form': form })
+
 
 # User views
 

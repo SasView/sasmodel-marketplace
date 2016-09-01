@@ -22,6 +22,7 @@
 </p>
 {% endif %}
 
+<a href="{% url 'detail' model_id=file_object.model.id %}" class="btn btn-default">Back to Model</a>
 <a class="btn btn-primary" href="{{ file_object.model_file.url }}" target="_blank">Download</a>
 
 {% endblock content %}

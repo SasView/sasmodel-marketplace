@@ -200,3 +200,18 @@ class UserTests(TestCase):
         response = delete(request, model.id)
         self.assertRedirects(response, reverse('profile'),
             fetch_redirect_response=False)
+
+    def test_upload_permissions(self):
+        factory = RequestFactory()
+        owner = create_user()
+        current = create_user(sign_in=True, client=self.client)
+        model = create_model(user=owner)
+
+        request = factory.get('/models/{}/files/'.format(model.id))
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        request.user = current
+        response = edit(request, model_id=model.id)
+        self.assertRedirects(response, reverse('detail',
+            kwargs={ 'model_id': model.id }), fetch_redirect_response=False)

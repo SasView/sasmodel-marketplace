@@ -23,12 +23,12 @@
     {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}
-        <a class="btn btn-default" id="preview-btn" href="#preview">Preview</a>
+        <a class="btn btn-default" id="preview-btn" href="#preview">{% bootstrap_icon "eye-open" %} Preview</a>
         <button type="submit" class="btn btn-primary">
-            Save Changes
+            {% bootstrap_icon "save" %} Save Changes
         </button>
-        <a class="btn btn-danger" href="{% url 'profile' user_id=request.user.id %}">
-            Cancel
+        <a class="btn btn-danger" href="{% url 'detail' model_id=form.instance.id %}">
+            {% bootstrap_icon "remove-circle" %} Cancel
         </a>
     {% endbuttons %}
 </form>

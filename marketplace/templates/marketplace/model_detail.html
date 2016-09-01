@@ -1,4 +1,5 @@
 {% extends 'marketplace/base.html' %}
+{% load bootstrap3 %}
 
 {% block head %}
 <script type="text/javascript" async
@@ -52,11 +53,13 @@
 </table>
 
 {% if request.user == model.owner %}
-<a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary">Edit Details</a>
-<button type="button" class="btn btn-danger delete-btn" data-toggle="modal" data-target="#delModal">
-  Delete
+<div style="">
+<a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary btn-edit">{% bootstrap_icon "pencil" %} Edit Details</a>
+<a href="{% url 'edit_files' model_id=model.id %}" class="btn btn-primary btn-edit">{% bootstrap_icon "file" %} Edit Files</a>
+<button type="button" class="btn btn-danger delete-btn btn-edit" data-toggle="modal" data-target="#delModal">
+  {% bootstrap_icon 'remove-circle' %} Delete
 </button>
-
+</div>
 <!-- Modal -->
 <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="delModalLabel">
   <div class="modal-dialog" role="document">

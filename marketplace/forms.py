@@ -3,16 +3,23 @@ from django.forms import ModelForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import SasviewModel
+from .models import ModelFile
 
 class SasviewModelForm(ModelForm):
     class Meta:
         model = SasviewModel
         fields = ("name", "description")
         help_texts = {
-            'description': ("LaTeX formatting is supported. Use \\(...\\) to"
+            'description': ("LaTeX formatting is supported. Use $...$ to"
                 " denote inline maths, and $$...$$ or \\[...\\] to denote"
                 " displayed maths.")
         }
+
+class ModelFileForm(ModelForm):
+    class Meta:
+        model = ModelFile
+        fields = ("model_file",)
+        labels = { "model_file": "Upload a model file:" }
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField(required=True)

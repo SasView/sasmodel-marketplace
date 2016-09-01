@@ -5,3 +5,7 @@ body {
 .table > tbody > tr > td {
     vertical-align: middle;
 }
+
+.btn-edit {
+    margin: 2px 0 2px 0;
+}
