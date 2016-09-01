@@ -49,7 +49,7 @@
     {% endif %}
     <span>Page {{ results.number }} of {{ results.paginator.num_pages }}</span>
     {% if results.has_next %}
-        <a href="?query={{ query|iriencode }}&page={{ results.next_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-right' %} Next Page</a>
+        <a href="?query={{ query|iriencode }}&page={{ results.next_page_number }}" class="btn btn-default">Next Page {% bootstrap_icon 'menu-right' %}</a>
     {% endif %}
 </div>
 
