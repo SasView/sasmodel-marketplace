@@ -140,7 +140,6 @@ def edit_files(request, model_id):
         form = ModelFileForm(request.POST, request.FILES)
         if form.is_valid():
             model_file = form.save(commit=False)
-            print(form.data)
             model_file.name = request.FILES['model_file'].name
             model_file.model = model
             model_file.save()
