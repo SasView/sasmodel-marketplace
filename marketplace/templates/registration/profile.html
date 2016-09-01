@@ -40,7 +40,7 @@
         {% for model in models %}
             <tr>
                 <td><a href="{{ model.get_absolute_url }}">{{ model.name }}</a></td>
-                <td>{{ model.description }}</td>
+                <td>{{ model.description|truncatechars:250 }}</td>
                 {% if user == request.user %}
                 <td>
                     <a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary">Edit</a>
