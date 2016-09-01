@@ -29,9 +29,6 @@ class DatabaseStorage(Storage):
         self.DATABASE_NAME = settings.DATABASES['default']['NAME']
         self.DATABASE_USER = settings.DATABASES['default']['USER']
 
-        self.connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
-        self.cursor = self.connection.cursor()
-
     def _open(self, name, mode='rb'):
         """Open a file from database.
 
@@ -40,9 +37,11 @@ class DatabaseStorage(Storage):
         """
         assert mode == 'rb', "You've tried to open binary file without specifying binary mode! You specified: %s"%mode
 
-        print "SELECT {} FROM {} WHERE {} = '{}'".format(self.blob_column,self.db_table,self.fname_column,name)
-        self.cursor.execute("SELECT {} FROM {} WHERE {} = '{}'".format(self.blob_column,self.db_table,self.fname_column,name))
-        row = self.cursor.fetchone()
+        connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT {} FROM {} WHERE {} = '{}'".format(self.blob_column,self.db_table,self.fname_column,name))
+        row = cursor.fetchone()
         if row is None:
             return None
         inMemFile = StringIO.StringIO(row[0])
@@ -50,6 +49,10 @@ class DatabaseStorage(Storage):
         inMemFile.mode = mode
 
         retFile = File(inMemFile)
+
+        cursor.close()
+        connection.close()
+
         return retFile
 
     def _save(self, name, content):
@@ -61,18 +64,35 @@ class DatabaseStorage(Storage):
         binary = psycopg2.Binary(content.read())
         size = binary.__sizeof__()
 
+        connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
+        cursor = connection.cursor()
+
         #todo: check result and do something (exception?) if failed.
-        if self.exists(name):
-            self.cursor.execute("UPDATE {} SET {} = %s, {} = %s WHERE {} = '{}'".format(self.db_table,self.blob_column,self.size_column,self.fname_column,name),
+        if self.exists(name, cursor=cursor):
+            cursor.execute("UPDATE {} SET {} = %s, {} = %s WHERE {} = '{}'".format(self.db_table,self.blob_column,self.size_column,self.fname_column,name),
                                  (binary, size)  )
         else:
-            self.cursor.execute("INSERT INTO {} VALUES(%s, %s, %s)".format(self.db_table), (name, binary, size))
-        self.connection.commit()
+            cursor.execute("INSERT INTO {} VALUES(%s, %s, %s)".format(self.db_table), (name, binary, size))
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
         return name
 
-    def exists(self, name):
-        self.cursor.execute("SELECT {} FROM {} WHERE {} = '{}'".format(self.fname_column,self.db_table,self.fname_column,name))
-        row = self.cursor.fetchone()
+    def exists(self, name, cursor=None):
+        cursor_supplied = (cursor is not None)
+        if not cursor_supplied:
+            connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
+            cursor = connection.cursor()
+
+        cursor.execute("SELECT {} FROM {} WHERE {} = '{}'".format(self.fname_column,self.db_table,self.fname_column,name))
+        row = cursor.fetchone()
+
+        if not cursor_supplied:
+            cursor.close()
+            connection.close()
+
         return row is not None
 
     def get_available_name(self, name, max_length=100):
@@ -90,9 +110,13 @@ class DatabaseStorage(Storage):
         return name
 
     def delete(self, name):
-        if self.exists(name):
-            self.cursor.execute("DELETE FROM {} WHERE {} = '{}'".format(self.db_table,self.fname_column,name))
-            self.connection.commit()
+        connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
+        cursor = connection.cursor()
+        if self.exists(name, cursor):
+            cursor.execute("DELETE FROM {} WHERE {} = '{}'".format(self.db_table,self.fname_column,name))
+            connection.commit()
+        cursor.close()
+        connection.close()
 
     def url(self, name):
         if self.base_url is None:
@@ -100,8 +124,15 @@ class DatabaseStorage(Storage):
         return urlparse.urljoin(self.base_url, name).replace('\\', '/')
 
     def size(self, name):
-        self.cursor.execute("SELECT {} from {} where {} = '{}'".format(self.size_column,self.db_table,self.fname_column,name))
-        row = self.cursor.fetchone()
+        connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT {} from {} where {} = '{}'".format(self.size_column,self.db_table,self.fname_column,name))
+        row = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
         if row is None:
             return 0
         else:
