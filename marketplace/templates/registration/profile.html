@@ -26,7 +26,13 @@
 {% endif %}
 
 {% if models %}
+    {% if user == request.user %}
+    <h2>Your Models</h2>
+    {% else %}
     <h2>Models Uploaded by {{ user.username }}:</h2>
+    {% endif %}
+
+
     <table class="table">
         <thead>
         <tr>
@@ -40,10 +46,10 @@
         <tbody>
         {% for model in models %}
             <tr>
-                <td><a href="{{ model.get_absolute_url }}">{{ model.name }}</a></td>
-                <td>{{ model.description|truncatechars:250 }}</td>
+                <td class="model-name"><a href="{{ model.get_absolute_url }}">{{ model.name }}</a></td>
+                <td id="model-desc">{{ model.description|truncatechars:250 }}</td>
                 {% if user == request.user %}
-                <td>
+                <td style="min-width: 330px;">
                     <a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary btn-edit">{% bootstrap_icon 'pencil' %} Edit Details</a>
                     <a href="{% url 'edit_files' model_id=model.id %}" class="btn btn-primary btn-edit">{% bootstrap_icon 'file' %} Edit Files</a>
                     <button type="button" class="btn btn-danger delete-btn btn-edit" id="{{ model.id }}" data-toggle="modal" data-target="#delModal">
@@ -56,6 +62,16 @@
         </tbody>
 
     </table>
+
+    <div class="btn-edit">
+        {% if models.has_previous %}
+            <a href="?page={{ models.previous_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-left' %} Previous Page</a>
+        {% endif %}
+        <span>Page {{ models.number }} of {{ models.paginator.num_pages }}</span>
+        {% if models.has_next %}
+            <a href="?page={{ models.next_page_number }}" class="btn btn-default">Next Page {% bootstrap_icon 'menu-right' %}</a>
+        {% endif %}
+    </div>
 
 {% if user == request.user %}
 

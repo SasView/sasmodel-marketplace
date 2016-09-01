@@ -162,7 +162,19 @@ def profile(request, user_id=None):
     if user_id is None:
         user_id = request.user.id
     user = get_object_or_404(User, pk=user_id)
-    models = SasviewModel.objects.filter(owner__pk=user.id)
+    all_models = SasviewModel.objects.filter(owner__pk=user.id)
+
+    paginator = Paginator(all_models, 5)
+
+    page = request.GET.get('page')
+    try:
+        models = paginator.page(page)
+    except PageNotAnInteger:
+        models = paginator.page(1)
+    except EmptyPage:
+        # Page is out of range
+        models = paginator.page(paginator.num_pages)
+
     return render(request, 'registration/profile.html', { 'models': models, 'user': user })
 
 @login_required
