@@ -10,10 +10,17 @@
 {% endblock head %}
 
 {% block content %}
-<h1>{{ file_object.name }}</h1>
+<h1>{{ file_object.model.name }} - {{ file_object.name }}</h1>
+
+{% if file_content %}
 <pre>
     <code>{{ file_content }}</code>
 </pre>
+{% else %}
+<p>
+    File preview not available.
+</p>
+{% endif %}
 
 <a class="btn btn-primary" href="{{ file_object.model_file.url }}" target="_blank">Download</a>
 

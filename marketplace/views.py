@@ -34,8 +34,14 @@ def show_file(request, file_id):
     model_file = get_object_or_404(ModelFile, pk=file_id)
     file_content = model_file.model_file.read()
 
-    return render(request, 'marketplace/show_code.html',
-        { 'file_object': model_file, 'file_content': file_content })
+    try:
+        res = render(request, 'marketplace/show_code.html',
+            { 'file_object': model_file, 'file_content': file_content })
+    except:
+        res = render(request, 'marketplace/show_code.html',
+            { 'file_object': model_file })
+
+    return res
 
 def download_file(request, filename):
     storage = DatabaseStorage()
