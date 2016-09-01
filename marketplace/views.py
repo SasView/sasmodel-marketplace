@@ -118,6 +118,17 @@ def download_file(request, filename):
     return res
 
 @login_required
+def delete_file(request, file_id):
+    model_file = ModelFile.objects.filter(pk=file_id).first()
+    if not model_file.model.owner == request.user:
+        messages.error(request, "You are not authorised to delete this file.",
+            extra_tags="danger")
+        return redirect('detail', model_id=model_file.model.id)
+    model_file.delete()
+    messages.success(request, "File successfully deleted.")
+    return redirect('edit_files', model_id=model_file.model.id)
+
+@login_required
 def edit_files(request, model_id):
     model = check_owned_by(request, model_id)
     if not isinstance(model, SasviewModel):

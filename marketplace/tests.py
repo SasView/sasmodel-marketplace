@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from marketplace.models import SasviewModel, ModelFile
-from marketplace.views import edit, delete
+from marketplace.views import edit, delete, edit_files, delete_file
 
 def create_user(username=None, email=None, password="testpassword",
     commit=True, sign_in=False, client=None):
@@ -212,6 +212,37 @@ class UserTests(TestCase):
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
         request.user = current
-        response = edit(request, model_id=model.id)
+        response = edit_files(request, model_id=model.id)
         self.assertRedirects(response, reverse('detail',
             kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
+
+    def test_file_delete_permission(self):
+        factory = RequestFactory()
+        owner = create_user()
+        current = create_user(sign_in=True, client=self.client)
+        model = create_model(user=owner)
+        model_file = create_file(model=model)
+
+        # Check unauthorised user can't delete
+        request = factory.get('/uploads/{}/delete/'.format(model_file.id))
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        request.user = current
+        response = delete_file(request, file_id=model_file.id)
+        self.assertRedirects(response, reverse('detail',
+            kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
+        my_files = ModelFile.objects.filter(model__pk=model.id)
+        self.assertEqual(len(my_files), 1)
+
+        # Check authorised user can delete
+        request = factory.get('/uploads/{}/delete/'.format(model_file.id))
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        request.user = owner
+        response = delete_file(request, file_id=model_file.id)
+        self.assertRedirects(response, reverse('edit_files',
+            kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
+        my_files = ModelFile.objects.filter(model__pk=model.id)
+        self.assertEqual(len(my_files), 0)
