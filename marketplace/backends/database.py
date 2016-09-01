@@ -71,7 +71,7 @@ class DatabaseStorage(Storage):
         return name
 
     def exists(self, name):
-        self.cursor.execute("SELECT {} from {} where {} = '{}'".format(self.fname_column,self.db_table,self.fname_column,name))
+        self.cursor.execute("SELECT {} FROM {} WHERE {} = '{}'".format(self.fname_column,self.db_table,self.fname_column,name))
         row = self.cursor.fetchone()
         return row is not None
 
