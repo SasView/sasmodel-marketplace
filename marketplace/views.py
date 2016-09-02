@@ -11,6 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import SignupForm
 from .forms import SasviewModelForm
 from .forms import ModelFileForm
+from .forms import CommentForm
 from .models import SasviewModel
 from .models import ModelFile
 from .models import Comment
@@ -50,8 +51,20 @@ def detail(request, model_id):
     model = get_object_or_404(SasviewModel, pk=model_id)
     files = ModelFile.objects.filter(model__pk=model.id)
     comments = Comment.objects.filter(model__pk=model.id)
+    form = CommentForm(request.POST or None)
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.error(request, "You must log in to post a comment.",
+                extra_tags="danger")
+            form = CommentForm()
+        elif form.is_valid():
+            comment = form.save(commit=False)
+            comment.model = model
+            comment.user = request.user
+            comment.save()
+            form = CommentForm()
     return render(request, 'marketplace/model_detail.html',
-        { 'model': model, 'files': files, 'comments': comments })
+        { 'model': model, 'files': files, 'comments': comments, 'form': form })
 
 @login_required
 def create(request):

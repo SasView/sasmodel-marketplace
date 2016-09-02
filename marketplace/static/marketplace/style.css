@@ -45,3 +45,7 @@ body {
 .comment .actions {
     text-align: right;
 }
+
+#comment-form div textarea {
+    max-height: 110px;
+}

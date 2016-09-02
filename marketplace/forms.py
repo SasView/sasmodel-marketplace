@@ -6,6 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.template.defaultfilters import filesizeformat
 from .models import SasviewModel
 from .models import ModelFile
+from .models import Comment
 import magic
 
 class SasviewModelForm(ModelForm):
@@ -47,6 +48,12 @@ class ModelFileForm(ModelForm):
         model = ModelFile
         fields = ("model_file",)
         labels = { "model_file": "Upload a model file:" }
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ("content",)
+        labels = { "content": "Add a comment:" }
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField(required=True)

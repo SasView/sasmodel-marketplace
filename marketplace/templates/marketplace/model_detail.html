@@ -118,5 +118,20 @@
     </p>
 {% endif %}
 
+{% if request.user.is_authenticated %}
+    <form class="form" action="{% url 'detail' model_id=model.id %}" method="post" id="comment-form">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">{% bootstrap_icon 'comment' %} Comment</button>
+        {% endbuttons %}
+    </form>
+{% else %}
+    <p>
+        Please log in to add a comment.
+    </p>
+{% endif %}
+
+
 
 {% endblock content %}
