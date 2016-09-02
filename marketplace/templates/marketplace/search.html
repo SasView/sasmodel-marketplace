@@ -26,11 +26,25 @@
 </p>
 
 <table class="table search-results">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Upload Date</th>
+        <th>Author</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for model in results %}
     <tr>
         <td class="model-name"><a href="{% url 'detail' model.id %}">{{ model.name }}</a></td>
         <td id="model-desc">{{ model.description_truncated }}</td>
+        <td>{{ model.category|default_if_none:"none" }}</td>
+        <td>{{ model.upload_date|date:"d M Y" }}</td>
+        <td>{{ model.user.username }}</td>
     </tr>
+    </tbody>
     {% endfor %}
 </table>
 {% elif query %}

@@ -23,13 +23,26 @@
 {% if models %}
 
 <table class="table search-results">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Upload Date</th>
+        <th>Author</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for model in models %}
     <tr>
         <td class="model-name"><a href="{% url 'detail' model.id %}">{{ model.name }}</a></td>
-        <td id="model-desc">{{ model.description_truncated }}</td>
-        <td>Uploaded on {{ model.upload_date|date:"d M Y" }} by {{ model.owner.username }}</td>
+        <td>{{ model.description_truncated }}</td>
+        <td>{{ model.category|default_if_none:"None" }}</td>
+        <td>{{ model.upload_date|date:"d M Y" }}</td>
+        <td>{{ model.owner.username }}</td>
     </tr>
     {% endfor %}
+    </tbody>
 </table>
 {% else %}
 <p>
