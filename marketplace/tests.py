@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from marketplace.models import SasviewModel, ModelFile
+from marketplace.models import SasviewModel, ModelFile, Comment
 from marketplace.views import edit, delete, edit_files, delete_file
 
 def create_user(username=None, email=None, password="testpassword",
@@ -44,6 +44,16 @@ def create_file(model=None, name='model_name.py', commit=True):
 
     return model_file
 
+def create_comment(user=None, model=None, content="This is a comment", commit=True):
+    if user is None:
+        user = create_user()
+    if model is None:
+        model = create_model()
+    comment = Comment(user=user, model=model, content=content)
+    if commit:
+        comment.save()
+    return comment
+
 
 class SasviewModelTests(TestCase):
 
@@ -77,7 +87,7 @@ class SasviewModelTests(TestCase):
 
 class ModelFileTests(TestCase):
 
-    def test_owndership(self):
+    def test_ownership(self):
         model = create_model()
         model_file = create_file(model=model)
 
@@ -249,3 +259,33 @@ class UserTests(TestCase):
             kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
         my_files = ModelFile.objects.filter(model__pk=model.id)
         self.assertEqual(len(my_files), 0)
+
+class CommentTests(TestCase):
+
+    def test_time(self):
+        comment = create_comment()
+        self.assertEqual(comment.time.date(), timezone.now().date())
+
+    def test_user_delete(self):
+        user = create_user()
+        create_comment(user=user)
+        create_comment(user=user)
+
+        my_comments = Comment.objects.filter(user__pk=user.id)
+        self.assertEqual(len(my_comments), 2)
+
+        user.delete()
+        my_comments = Comment.objects.all()
+        self.assertEqual(len(my_comments), 0)
+
+    def test_model_delete(self):
+        model = create_model()
+        create_comment(model=model)
+        create_comment(model=model)
+
+        comments = Comment.objects.filter(model__pk=model.id).all()
+        self.assertEqual(len(comments), 2)
+
+        model.delete()
+        comments = Comment.objects.all()
+        self.assertEqual(len(comments), 0)

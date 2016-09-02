@@ -13,6 +13,7 @@ from .forms import SasviewModelForm
 from .forms import ModelFileForm
 from .models import SasviewModel
 from .models import ModelFile
+from .models import Comment
 from .helpers import check_owned_by
 from .backends.database import DatabaseStorage
 
@@ -48,8 +49,9 @@ def search(request):
 def detail(request, model_id):
     model = get_object_or_404(SasviewModel, pk=model_id)
     files = ModelFile.objects.filter(model__pk=model.id)
+    comments = Comment.objects.filter(model__pk=model.id)
     return render(request, 'marketplace/model_detail.html',
-        { 'model': model, 'files': files })
+        { 'model': model, 'files': files, 'comments': comments })
 
 @login_required
 def create(request):

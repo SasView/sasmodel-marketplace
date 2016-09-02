@@ -30,6 +30,18 @@ class ModelFile(models.Model):
     def __str__(self):
         return self.name
 
+class Comment(models.Model):
+    content = models.TextField(max_length=500)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    model = models.ForeignKey(SasviewModel, on_delete=models.CASCADE)
+    time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        content_str = self.content
+        if len(content_str) > 50:
+            content_str = content_str[:47] + "..."
+        return "{}: {}".format(self.user.username, content_str)
+
 @receiver(pre_delete)
 def delete_file(sender, instance, **kwargs):
     if sender == SasviewModel:

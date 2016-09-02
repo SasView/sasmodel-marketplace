@@ -89,4 +89,34 @@
 </script>
 {% endif %}
 
+<h3>Comments:</h3>
+{% if comments %}
+    {% for comment in comments %}
+        <div class="comment well">
+            <div class="detail-container">
+                <div class="user">
+                    {{ comment.user.username }}:
+                </div>
+                <div class="time">
+                    {{ comment.time|date:"D d M Y" }} at {{ comment.time|date:"H:i" }}
+                </div>
+            </div>
+            <div class="content">
+                {{ comment.content }}
+            </div>
+            {% if comment.user == request.user %}
+            <div class="actions">
+                <a href="#" class="btn btn-danger btn-sm">Delete Comment</a>
+            </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+{% else %}
+    <p>
+        No comments yet.
+    </p>
+{% endif %}
+
+
 {% endblock content %}

@@ -23,3 +23,25 @@ body {
 .pagination-container < div {
     display: inline-block;
 }
+
+.comment {
+    margin: 10px;
+}
+
+.comment .detail-container {
+    text-align: right;
+    padding-bottom: 10px;
+}
+
+.comment .time {
+    display: inline-block;
+}
+
+.comment .user {
+    float: left;
+    font-weight: bold;
+}
+
+.comment .actions {
+    text-align: right;
+}
