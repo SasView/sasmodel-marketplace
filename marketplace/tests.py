@@ -28,8 +28,7 @@ create_user.id = 0
 def create_model(user=None, name="Model", desc="Description", commit=True):
     if user is None:
         user = create_user()
-    model = SasviewModel(name=name, description=desc,
-        upload_date=timezone.now(), owner=user)
+    model = SasviewModel(name=name, description=desc, owner=user)
     if commit:
         model.save()
     return model
@@ -47,6 +46,10 @@ def create_file(model=None, name='model_name.py', commit=True):
 
 
 class SasviewModelTests(TestCase):
+
+    def test_upload_date(self):
+        model = create_model()
+        self.assertEqual(model.upload_date.date(), timezone.now().date())
 
     def test_ownership(self):
         owner = create_user()

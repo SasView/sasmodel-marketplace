@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
-from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -59,7 +58,6 @@ def create(request):
         if form.is_valid():
             model = form.save(commit=False)
             model.owner = request.user
-            model.upload_date = timezone.now()
             model.save()
             messages.success(request, "Model successfully created.")
             return redirect('detail', model_id=model.id)

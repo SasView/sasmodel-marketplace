@@ -10,7 +10,8 @@ from django.db.models.signals import pre_delete
 class SasviewModel(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField()
-    upload_date = models.DateTimeField('date published')
+    upload_date = models.DateTimeField(verbose_name='Date Published',
+        auto_now_add=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
