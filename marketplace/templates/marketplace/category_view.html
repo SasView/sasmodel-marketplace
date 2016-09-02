@@ -18,7 +18,11 @@
 {% endblock head %}
 
 {% block content %}
-<h1>Browse Models</h1>
+{% if category_name %}
+    <h1>{{ category_name }}</h1>
+{% else %}
+    <h1>Browse Models</h1>
+{% endif %}
 
 {% if models %}
 
@@ -38,7 +42,7 @@
         <td class="model-name"><a href="{% url 'detail' model.id %}">{{ model.name }}</a></td>
         <td>{{ model.description_truncated }}</td>
         <td>{{ model.category|default_if_none:"None" }}</td>
-        <td>{{ model.upload_date|date:"d M Y" }}</td>
+        <td class="model-date">{{ model.upload_date|date:"d M Y" }}</td>
         <td>{{ model.owner.username }}</td>
     </tr>
     {% endfor %}

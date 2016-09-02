@@ -23,6 +23,10 @@ body {
     min-width: 150px;
 }
 
+.model-date {
+    min-width: 105px;
+}
+
 .pagination-container {
     text-align: center;
     padding: 5px;

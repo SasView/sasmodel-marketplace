@@ -41,7 +41,7 @@
         <td class="model-name"><a href="{% url 'detail' model.id %}">{{ model.name }}</a></td>
         <td id="model-desc">{{ model.description_truncated }}</td>
         <td>{{ model.category|default_if_none:"none" }}</td>
-        <td>{{ model.upload_date|date:"d M Y" }}</td>
+        <td class="model-date">{{ model.upload_date|date:"d M Y" }}</td>
         <td>{{ model.user.username }}</td>
     </tr>
     </tbody>
