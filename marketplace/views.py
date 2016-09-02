@@ -19,9 +19,19 @@ from .helpers import check_owned_by
 from .backends.database import DatabaseStorage
 
 def index(request):
-    latest_models = SasviewModel.objects.order_by('-upload_date')[:5]
-    context = { 'latest_models': latest_models }
-    return render(request, 'marketplace/index.html', context)
+    all_models = SasviewModel.objects.order_by('-upload_date')
+
+    paginator = Paginator(all_models, 15)
+    page = request.GET.get('page')
+    try:
+        models = paginator.page(page)
+    except PageNotAnInteger:
+        models = paginator.page(1)
+    except EmptyPage:
+        # Page is out of range
+        models = paginator.page(paginator.num_pages)
+
+    return render(request, 'marketplace/index.html', { 'models': models })
 
 def search(request):
     query = None

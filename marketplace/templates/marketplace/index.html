@@ -1,15 +1,53 @@
 {% extends 'marketplace/base.html' %}
+{% load bootstrap3 %}
+
+{% block head %}
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<script type="text/javascript">
+    window.MathJax = ({
+        elements: ["model-desc"],
+        tex2jax: {
+            // Dislay all LaTeX as inline
+            inlineMath: [ ['$', '$'], [ "\\(", "\\)" ], [ "\\[", "\\]" ], [ "$$", "$$" ] ],
+            processEscapes: true
+        }
+    });
+</script>
+{% endblock head %}
 
 {% block content %}
-<h1>Latest Models</h1>
-{% if latest_models %}
-    <ul>
-        {% for model in latest_models %}
-            <li><a href="{% url 'detail' model.id %}">{{model.name}}</a></li>
-        {% endfor %}
-    </ul>
+<h1>Recently Uploaded Models</h1>
 
+{% if models %}
+
+<table class="table search-results">
+    {% for model in models %}
+    <tr>
+        <td class="model-name"><a href="{% url 'detail' model.id %}">{{ model.name }}</a></td>
+        <td id="model-desc">{{ model.description_truncated }}</td>
+        <td>Uploaded on {{ model.upload_date|date:"d M Y" }} by {{ model.owner.username }}</td>
+    </tr>
+    {% endfor %}
+</table>
 {% else %}
-    <p>No models yet!</p>
+<p>
+    No models uploaded yet.
+</p>
 {% endif %}
+
+<div class="pagination-container">
+<div>
+    {% if models.has_previous %}
+        <a href="?page={{ models.previous_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-left' %}</a>
+    {% endif %}
+    <span>Page {{ models.number }} of {{ models.paginator.num_pages }}</span>
+    {% if models.has_next %}
+        <a href="?page={{ models.next_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-right' %}</a>
+    {% endif %}
+</div>
+</div>
+
+
 {% endblock content %}
