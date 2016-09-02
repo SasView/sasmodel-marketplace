@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from marketplace.models import SasviewModel, ModelFile, Comment
-from marketplace.views import edit, delete, edit_files, delete_file
+from marketplace.views import edit, delete, edit_files, delete_file, delete_comment
 
 def create_user(username=None, email=None, password="testpassword",
     commit=True, sign_in=False, client=None):
@@ -170,7 +170,7 @@ class UserTests(TestCase):
     def test_edit_permissions(self):
         factory = RequestFactory()
         owner = create_user()
-        current = create_user(sign_in=True, client=self.client)
+        current = create_user()
         model = create_model(user=owner)
 
         request = factory.get('/models/{}/edit/'.format(model.id))
@@ -191,7 +191,7 @@ class UserTests(TestCase):
     def test_delete_permissions(self):
         factory = RequestFactory()
         owner = create_user()
-        current = create_user(sign_in=True, client=self.client)
+        current = create_user()
         model = create_model(user=owner)
 
         request = factory.get('/models/{}/delete/'.format(model.id))
@@ -217,7 +217,7 @@ class UserTests(TestCase):
     def test_upload_permissions(self):
         factory = RequestFactory()
         owner = create_user()
-        current = create_user(sign_in=True, client=self.client)
+        current = create_user()
         model = create_model(user=owner)
 
         request = factory.get('/models/{}/files/'.format(model.id))
@@ -232,7 +232,7 @@ class UserTests(TestCase):
     def test_file_delete_permission(self):
         factory = RequestFactory()
         owner = create_user()
-        current = create_user(sign_in=True, client=self.client)
+        current = create_user()
         model = create_model(user=owner)
         model_file = create_file(model=model)
 
@@ -259,6 +259,36 @@ class UserTests(TestCase):
             kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
         my_files = ModelFile.objects.filter(model__pk=model.id)
         self.assertEqual(len(my_files), 0)
+
+    def test_comment_delete_permission(self):
+        factory = RequestFactory()
+        owner = create_user()
+        comment = create_comment(user=owner)
+        current = create_user()
+
+        # Check unauthorised user can't delete
+        request = factory.get('/comments/{}/delete/'.format(comment.id))
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        request.user = current
+        response = delete_comment(request, comment_id=comment.id)
+        self.assertRedirects(response, reverse('detail',
+            kwargs={ 'model_id': comment.model.id }), fetch_redirect_response=False)
+        my_comments = Comment.objects.filter(user__pk=owner.id)
+        self.assertEqual(len(my_comments), 1)
+
+        # Check authorised user can delete
+        request = factory.get('/comments/{}/delete/'.format(comment.id))
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        request.user = owner
+        response = delete_comment(request, comment_id=comment.id)
+        self.assertRedirects(response, reverse('detail',
+            kwargs={ 'model_id': comment.model.id }), fetch_redirect_response=False)
+        my_comments = Comment.objects.filter(user__pk=owner.id)
+        self.assertEqual(len(my_comments), 0)
 
 class CommentTests(TestCase):
 

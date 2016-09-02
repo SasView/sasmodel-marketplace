@@ -148,6 +148,18 @@ def edit_files(request, model_id):
     return render(request, 'marketplace/model_file_edit.html',
         { 'model': model, 'files': files, 'form': form })
 
+# Comment views
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = Comment.objects.filter(pk=comment_id).first()
+    if comment.user != request.user:
+        messages.error(request, "You are not authorised to delete this comment",
+            extra_tags="danger")
+    else:
+        comment.delete()
+        messages.success(request, "Comment successfully deleted.")
+    return redirect('detail', model_id=comment.model.id)
 
 # User views
 

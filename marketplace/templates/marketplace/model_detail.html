@@ -106,7 +106,7 @@
             </div>
             {% if comment.user == request.user %}
             <div class="actions">
-                <a href="#" class="btn btn-danger btn-sm">Delete Comment</a>
+                <a href="{% url 'delete_comment' comment_id=comment.id %}" class="btn btn-danger btn-sm">Delete Comment</a>
             </div>
             {% endif %}
         </div>
