@@ -6,6 +6,11 @@ from .backends.database import DatabaseStorage
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete
 
+def truncate(string, length):
+    if len(string) > length:
+        string = string[:length-3] + "..."
+    return string
+
 @python_2_unicode_compatible
 class SasviewModel(models.Model):
     name = models.CharField(max_length=150)
@@ -19,6 +24,9 @@ class SasviewModel(models.Model):
 
     def get_absolute_url(self):
         return reverse('detail', kwargs={'model_id': self.id})
+
+    def description_truncated(self):
+        return truncate(self.description, 125)
 
 @python_2_unicode_compatible
 class ModelFile(models.Model):
@@ -36,10 +44,11 @@ class Comment(models.Model):
     model = models.ForeignKey(SasviewModel, on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
 
+    def content_truncated(self):
+        return truncate(self.content, 125)
+
     def __str__(self):
-        content_str = self.content
-        if len(content_str) > 50:
-            content_str = content_str[:47] + "..."
+        content_str = self.content_truncated()
         return "{}: {}".format(self.user.username, content_str)
 
 @receiver(pre_delete)
