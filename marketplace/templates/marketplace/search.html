@@ -29,7 +29,7 @@
     {% for model in results %}
     <tr>
         <td class="model-name"><a href="{% url 'detail' model.id %}">{{ model.name }}</a></td>
-        <td id="model-desc">{{ model.description|truncatechars:200 }}</td>
+        <td id="model-desc">{{ model.description_truncated }}</td>
     </tr>
     {% endfor %}
 </table>

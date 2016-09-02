@@ -26,7 +26,7 @@ class SasviewModel(models.Model):
         return reverse('detail', kwargs={'model_id': self.id})
 
     def description_truncated(self):
-        return truncate(self.description, 125)
+        return truncate(self.description, 200)
 
 @python_2_unicode_compatible
 class ModelFile(models.Model):
@@ -45,7 +45,7 @@ class Comment(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
     def content_truncated(self):
-        return truncate(self.content, 125)
+        return truncate(self.content, 150)
 
     def __str__(self):
         content_str = self.content_truncated()
