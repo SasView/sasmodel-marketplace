@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^models/(?P<model_id>[0-9]+)/edit/$', views.edit, name='edit'),
     url(r'^models/(?P<model_id>[0-9]+)/delete/$', views.delete, name='delete'),
     url(r'^models/(?P<model_id>[0-9]+)/files/$', views.edit_files, name='edit_files'),
+    url(r'^models/(?P<model_id>[0-9]+)/verify/$', views.verify, name='verify'),
     url(r'^models/create/$', views.create, name='create'),
     url(r'^models/(?P<slug>[-\w]+)/$', views.view_category, name='view_category'),
     url(r'^models/$', views.view_category, name='view_category'),

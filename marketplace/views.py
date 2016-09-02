@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import login
@@ -137,6 +138,28 @@ def delete(request, model_id):
     model.delete()
     messages.success(request, "Model deleted")
     return redirect('profile')
+
+@login_required
+def verify(request, model_id):
+    if not request.user.is_staff:
+        messages.error(request, "You do not have permission to verify this model",
+            extra_tags="danger")
+        return redirect('detail', model_id=model_id)
+    model = get_object_or_404(SasviewModel, pk=model_id)
+    if model.verified:
+        model.verified = False
+        model.verified_by = None
+        model.verfied_date = None
+    else:
+        model.verified = True
+        model.verified_by = request.user
+        model.verfied_date = timezone.now()
+    model.save()
+    action = "unverified"
+    if model.verified: action = "verified"
+    messages.success(request, "Model has been {}".format(action))
+    return redirect('detail', model_id=model.id)
+
 
 # Model file views
 

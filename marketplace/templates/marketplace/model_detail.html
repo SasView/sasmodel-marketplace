@@ -68,7 +68,7 @@
 </table>
 
 {% if request.user == model.owner %}
-<div style="">
+<div>
 <a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary btn-edit">{% bootstrap_icon "pencil" %} Edit Details</a>
 <a href="{% url 'edit_files' model_id=model.id %}" class="btn btn-primary btn-edit">{% bootstrap_icon "file" %} Edit Files</a>
 <button type="button" class="btn btn-danger delete-btn btn-edit" data-toggle="modal" data-target="#delModal">
@@ -102,6 +102,16 @@
         $('#modal-del-btn').attr('href', deleteUrl);
     });
 </script>
+{% endif %}
+
+{% if request.user.is_staff %}
+<div>
+    {% if model.verified == False %}
+        <a href="{% url 'verify' model_id=model.id %}" class="btn btn-success">{% bootstrap_icon 'ok' %} Verify</a>
+    {% else %}
+        <a href="{% url 'verify' model_id=model.id %}" class="btn btn-danger">{% bootstrap_icon 'remove' %} Un-Verify</a>
+    {% endif %}
+</div>
 {% endif %}
 
 <h3>Comments:</h3>
