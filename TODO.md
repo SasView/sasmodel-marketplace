@@ -1,9 +1,4 @@
 # TODO    
-- [x] File storage:
-    - [x] Create separate model for file:
-        - Store actual file name as well as path to file in DB
-        - User has many files
-    - [x] Allow uploading multiple files
 - [ ] Tests for filling in forms
 - [ ] SasviewModel:
     - [ ] Add download_count attribute and/or rating system (in order to sort models by popularity)
@@ -11,4 +6,4 @@
 - [ ] List all models on index page (implement pagination)
 - [ ] Mail server for password reset
 - [x] Implement search
-- [ ] Allow commenting on models
+- [x] Allow commenting on models
