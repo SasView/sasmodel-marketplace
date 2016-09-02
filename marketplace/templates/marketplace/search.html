@@ -43,16 +43,17 @@
 </p>
 {% endif %}
 
-<div class="btn-edit">
+<div class="pagination-container">
+<div>
     {% if results.has_previous %}
-        <a href="?query={{ query|iriencode }}&page={{ results.previous_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-left' %} Previous Page</a>
+        <a href="?query={{ query|iriencode }}&page={{ results.previous_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-left' %}</a>
     {% endif %}
     <span>Page {{ results.number }} of {{ results.paginator.num_pages }}</span>
     {% if results.has_next %}
-        <a href="?query={{ query|iriencode }}&page={{ results.next_page_number }}" class="btn btn-default">Next Page {% bootstrap_icon 'menu-right' %}</a>
+        <a href="?query={{ query|iriencode }}&page={{ results.next_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-right' %}</a>
     {% endif %}
 </div>
-
+</div>
 
 
 {% endblock content %}

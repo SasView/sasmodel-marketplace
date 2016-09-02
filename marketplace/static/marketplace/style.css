@@ -14,3 +14,12 @@ body {
     font-size: 18pt;
     min-width: 150px;
 }
+
+.pagination-container {
+    text-align: center;
+    padding: 5px;
+}
+
+.pagination-container < div {
+    display: inline-block;
+}

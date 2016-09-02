@@ -63,14 +63,16 @@
 
     </table>
 
-    <div class="btn-edit">
+    <div class="pagination-container">
+    <div>
         {% if models.has_previous %}
-            <a href="?page={{ models.previous_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-left' %} Previous Page</a>
+            <a href="?page={{ models.previous_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-left' %}</a>
         {% endif %}
         <span>Page {{ models.number }} of {{ models.paginator.num_pages }}</span>
         {% if models.has_next %}
-            <a href="?page={{ models.next_page_number }}" class="btn btn-default">Next Page {% bootstrap_icon 'menu-right' %}</a>
+            <a href="?page={{ models.next_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-right' %}</a>
         {% endif %}
+    </div>
     </div>
 
 {% if user == request.user %}
