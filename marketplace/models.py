@@ -31,6 +31,11 @@ class SasviewModel(models.Model):
         auto_now_add=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    verified = models.BooleanField(default=False)
+    verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+        related_name='models_verified')
+    verfied_date = models.DateTimeField(null=True)
+
     def __str__(self):
         return self.name
 

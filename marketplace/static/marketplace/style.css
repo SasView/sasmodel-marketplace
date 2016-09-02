@@ -61,3 +61,11 @@ body {
 #comment-form div textarea {
     max-height: 110px;
 }
+
+#verified {
+    color: #5cb85c;
+}
+
+#unverified {
+    color: #d9534f;
+}
