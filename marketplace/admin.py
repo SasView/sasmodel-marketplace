@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import SasviewModel, ModelFile, Comment
+from models import SasviewModel, ModelFile, Comment, Category
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
@@ -12,3 +12,5 @@ class ModelFileAdmin(admin.ModelAdmin):
 @admin.register(SasviewModel)
 class SasviewModelAdmin(admin.ModelAdmin):
     list_display = ('name', 'owner', 'description_truncated', 'upload_date')
+
+admin.site.register(Category)

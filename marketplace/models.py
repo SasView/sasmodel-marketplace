@@ -12,9 +12,20 @@ def truncate(string, length):
     return string
 
 @python_2_unicode_compatible
+class Category(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+@python_2_unicode_compatible
 class SasviewModel(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     upload_date = models.DateTimeField(verbose_name='Date Published',
         auto_now_add=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)

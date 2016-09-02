@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from marketplace.models import SasviewModel, ModelFile, Comment
+from marketplace.models import SasviewModel, ModelFile, Comment, Category
 from marketplace.views import edit, delete, edit_files, delete_file, delete_comment
 
 def create_user(username=None, email=None, password="testpassword",
@@ -25,10 +25,10 @@ def create_user(username=None, email=None, password="testpassword",
     return user
 create_user.id = 0
 
-def create_model(user=None, name="Model", desc="Description", commit=True):
+def create_model(user=None, name="Model", desc="Description", category=None, commit=True):
     if user is None:
         user = create_user()
-    model = SasviewModel(name=name, description=desc, owner=user)
+    model = SasviewModel(name=name, description=desc, owner=user, category=category)
     if commit:
         model.save()
     return model
@@ -319,3 +319,16 @@ class CommentTests(TestCase):
         model.delete()
         comments = Comment.objects.all()
         self.assertEqual(len(comments), 0)
+
+class CategoryTests(TestCase):
+
+    def test_delete_model(self):
+        category = Category(name="Shapes")
+        category.save()
+        model = create_model(category=category)
+
+        self.assertEqual(model.category, category)
+
+        category.delete()
+        model.refresh_from_db()
+        self.assertIsNone(model.category)

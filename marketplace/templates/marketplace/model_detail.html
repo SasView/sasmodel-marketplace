@@ -38,6 +38,11 @@
         <td>{{ model.upload_date }}</td>
     </tr>
     <tr>
+        <td><b>Category</b></td>
+        <td>{{ model.category|default_if_none:"None" }}</td>
+    </tr>
+
+    <tr>
         <td><b>Files</b></td>
         <td>
             {% if files %}
