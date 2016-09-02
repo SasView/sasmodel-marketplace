@@ -105,7 +105,7 @@ def create(request):
             model.owner = request.user
             model.save()
             messages.success(request, "Model successfully created.")
-            return redirect('detail', model_id=model.id)
+            return redirect('edit_files', model_id=model.id)
     else:
         form = SasviewModelForm()
     return render(request, 'marketplace/model_create.html', { 'form': form })

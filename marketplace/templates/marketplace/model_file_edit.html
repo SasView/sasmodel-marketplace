@@ -31,8 +31,6 @@
 </p>
 {% endif %}
 
-<a href="{% url 'detail' model_id=model.id %}" class="btn btn-default">Back to Model</a>
-
 <form class="form" action="{% url 'edit_files' model_id=model.id %}" method="post" enctype="multipart/form-data" style="padding-top: 25px;">
     {% csrf_token %}
     {% bootstrap_form form %}
@@ -40,4 +38,7 @@
         <button type="submit" class="btn btn-primary">{% bootstrap_icon "upload" %} Upload</button>
     {% endbuttons %}
 </form>
+
+<a href="{% url 'detail' model_id=model.id %}" class="btn btn-success">Done</a>
+
 {% endblock content %}
