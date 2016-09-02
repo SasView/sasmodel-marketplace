@@ -2,6 +2,14 @@ body {
     padding-top: 65px;
 }
 
+.navbar-header img {
+    float: left;
+    width: 34px;
+    margin-top: 8px;
+    margin-bottom: auto;
+    margin-right: 5px;
+}
+
 .table > tbody > tr > td {
     vertical-align: middle;
 }

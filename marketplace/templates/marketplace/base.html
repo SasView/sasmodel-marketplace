@@ -9,6 +9,7 @@
     <title>SasView Model Marketplace</title>
     {% bootstrap_css %}
     <link rel="stylesheet" href="{% static 'marketplace/style.css' %}" charset="utf-8" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'marketplace/ball.ico' %}">
     <script src="{% static 'marketplace/jquery-2.2.4.min.js' %}" charset="utf-8"></script>
     {% bootstrap_javascript %}
     {% block head %}{% endblock head %}
@@ -23,7 +24,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{% url 'index' %}">SasView Marketplace</a>
+                <img src="{% static 'marketplace/logo.png' %}"><a class="navbar-brand" href="{% url 'index' %}">SasView Marketplace</a>
             </div>
 
             <div class="collapse navbar-collapse" id="navbar-collapse-1">
