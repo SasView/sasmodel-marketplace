@@ -15,23 +15,24 @@ from .forms import CommentForm
 from .models import SasviewModel
 from .models import ModelFile
 from .models import Comment
+from .models import Category
 from .helpers import check_owned_by
 from .backends.database import DatabaseStorage
 
 def index(request):
-    all_models = SasviewModel.objects.order_by('-upload_date')
+    all_categories = Category.objects.all()
 
-    paginator = Paginator(all_models, 15)
+    paginator = Paginator(all_categories, 15)
     page = request.GET.get('page')
     try:
-        models = paginator.page(page)
+        categories = paginator.page(page)
     except PageNotAnInteger:
-        models = paginator.page(1)
+        categories = paginator.page(1)
     except EmptyPage:
         # Page is out of range
-        models = paginator.page(paginator.num_pages)
+        categories = paginator.page(paginator.num_pages)
 
-    return render(request, 'marketplace/index.html', { 'models': models })
+    return render(request, 'marketplace/index.html', { 'categories': categories })
 
 def search(request):
     query = None
@@ -75,6 +76,25 @@ def detail(request, model_id):
             form = CommentForm()
     return render(request, 'marketplace/model_detail.html',
         { 'model': model, 'files': files, 'comments': comments, 'form': form })
+
+def view_category(request, slug=None):
+    if slug is None:
+        models = SasviewModel.objects.all()
+    else:
+        category = get_object_or_404(Category, pk=slug)
+        models = SasviewModel.objects.filter(category__slug=category.slug)
+
+    paginator = Paginator(models, 20)
+    page = request.GET.get('page')
+    try:
+        models = paginator.page(page)
+    except PageNotAnInteger:
+        models = paginator.page(1)
+    except EmptyPage:
+        # Page is out of range
+        models = paginator.page(paginator.num_pages)
+
+    return render(request, 'marketplace/category_view.html', { 'models': models })
 
 @login_required
 def create(request):

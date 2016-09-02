@@ -18,46 +18,25 @@
 {% endblock head %}
 
 {% block content %}
-<h1>Recently Uploaded Models</h1>
+<h1>Browse Models</h1>
 
-{% if models %}
-
-<table class="table search-results">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Category</th>
-        <th>Upload Date</th>
-        <th>Author</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for model in models %}
-    <tr>
-        <td class="model-name"><a href="{% url 'detail' model.id %}">{{ model.name }}</a></td>
-        <td>{{ model.description_truncated }}</td>
-        <td>{{ model.category|default_if_none:"None" }}</td>
-        <td>{{ model.upload_date|date:"d M Y" }}</td>
-        <td>{{ model.owner.username }}</td>
-    </tr>
+<h3>Chose a Category:</h3>
+<ul style="font-size: 20px;">
+    {% for category in categories %}
+        <li><a href="{% url 'view_category' slug=category.slug %}">{{ category.name }}</a></li>
     {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>
-    No models uploaded yet.
-</p>
-{% endif %}
+    <li><a href="{% url 'view_category' %}">All Models</a></li>
+</ul>
+
 
 <div class="pagination-container">
 <div>
-    {% if models.has_previous %}
-        <a href="?page={{ models.previous_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-left' %}</a>
+    {% if categories.has_previous %}
+        <a href="?page={{ categories.previous_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-left' %}</a>
     {% endif %}
-    <span>Page {{ models.number }} of {{ models.paginator.num_pages }}</span>
-    {% if models.has_next %}
-        <a href="?page={{ models.next_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-right' %}</a>
+    <span>Page {{ categories.number }} of {{ categories.paginator.num_pages }}</span>
+    {% if categories.has_next %}
+        <a href="?page={{ categories.next_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-right' %}</a>
     {% endif %}
 </div>
 </div>

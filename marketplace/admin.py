@@ -11,6 +11,8 @@ class ModelFileAdmin(admin.ModelAdmin):
 
 @admin.register(SasviewModel)
 class SasviewModelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'description_truncated', 'upload_date')
+    list_display = ('name', 'owner', 'description_truncated', 'category', 'upload_date')
 
-admin.site.register(Category)
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    prepopulated_fields = { "slug": ("name",) }
