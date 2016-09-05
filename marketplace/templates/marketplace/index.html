@@ -18,9 +18,11 @@
 {% endblock head %}
 
 {% block content %}
-<h1>Browse Models</h1>
+<ol class="breadcrumb">
+    <li><a href="{% url 'index' %}">Categories</a></li>
+</ol>
 
-<h3>Chose a Category:</h3>
+<h3>Choose a Category:</h3>
 <ul style="font-size: 20px;">
     {% for category in categories %}
         <li><a href="{% url 'view_category' slug=category.slug %}">{{ category.name }}</a></li>

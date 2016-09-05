@@ -17,6 +17,17 @@
 {% endblock head %}
 
 {% block content %}
+
+<ol class="breadcrumb">
+    <li><a href="{% url 'index' %}">Categories</a></li>
+    {% if model.category %}
+        <li><a href="{% url 'view_category' slug=model.category.slug %}">{{ model.category.name }}</a></li>
+    {% else %}
+    <li><a href="{% url 'view_category' %}">All Models</a></li>
+    {% endif %}
+    <li><a href="{% url 'detail' model_id=model.id %}">{{ model.name }}</a></li>
+</ol>
+
 <h1>{{ model.name }}</h1>
 
 <h2>Description:</h2>

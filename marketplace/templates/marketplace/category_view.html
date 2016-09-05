@@ -18,10 +18,20 @@
 {% endblock head %}
 
 {% block content %}
-{% if category_name %}
-    <h1>{{ category_name }}</h1>
+
+<ol class="breadcrumb">
+    <li><a href="{% url 'index' %}">Categories</a></li>
+    {% if category %}
+        <li><a href="{% url 'view_category' slug=category.slug %}">{{ category.name }}</a></li>
+    {% else %}
+    <li><a href="{% url 'view_category' %}">All Models</a></li>
+    {% endif %}
+</ol>
+
+{% if category %}
+    <h1>{{ category.name }}</h1>
 {% else %}
-    <h1>Browse Models</h1>
+    <h1>All Models</h1>
 {% endif %}
 
 {% if models %}

@@ -10,7 +10,19 @@
 {% endblock head %}
 
 {% block content %}
-<h1>{{ file_object.model.name }} - {{ file_object.name }}</h1>
+
+<ol class="breadcrumb">
+    <li><a href="{% url 'index' %}">Categories</a></li>
+    {% if file_object.model.category %}
+        <li><a href="{% url 'view_category' slug=file_object.model.category.slug %}">{{ file_object.model.category.name }}</a></li>
+    {% else %}
+    <li><a href="{% url 'view_category' %}">All Models</a></li>
+    {% endif %}
+    <li><a href="{% url 'detail' model_id=file_object.model.id %}">{{ file_object.model.name }}</a></li>
+    <li><a href="{% url 'show_file' file_id=file_object.id %}">{{ file_object.name }}</a></li>
+</ol>
+
+<h2>{{ file_object.model.name }} - {{ file_object.name }}</h1>
 
 {% if file_content %}
 <pre>
