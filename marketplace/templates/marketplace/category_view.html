@@ -54,7 +54,7 @@
         <td>{{ model.description_truncated }}</td>
         <td>{{ model.category|default_if_none:"None" }}</td>
         <td class="model-date">{{ model.upload_date|date:"d M Y" }}</td>
-        <td>{{ model.owner.username }}</td>
+        <td><a href="{% url 'profile' user_id=model.owner.id %}">{{ model.owner.username }}</a></td>
         <td align="center">
             {% if model.verified %}
                 <span class="verified">{% bootstrap_icon 'ok' %}</span>
