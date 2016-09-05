@@ -84,6 +84,7 @@ class SasviewModelTests(TestCase):
         all_models = SasviewModel.objects.all()
         self.assertEqual(len(all_models), 0)
 
+
 class ModelFileTests(TestCase):
 
     def test_ownership(self):
@@ -313,6 +314,7 @@ class CommentTests(TestCase):
         comments = Comment.objects.all()
         self.assertEqual(len(comments), 0)
 
+
 class CategoryTests(TestCase):
 
     def test_delete_model(self):
@@ -325,3 +327,15 @@ class CategoryTests(TestCase):
         category.delete()
         model.refresh_from_db()
         self.assertIsNone(model.category)
+
+class SearchTests(TestCase):
+
+    def test_search_name(self):
+        model = create_model(name="Guinier-Porod")
+        response = self.client.get(reverse('search'), { 'query': 'Guinier' })
+        self.assertContains(response, "Guinier-Porod")
+
+    def test_search_description(self):
+        model = create_model(name="Guinier-Porod", desc="Blah blah keyword blah")
+        response = self.client.get(reverse('search'), { 'query': 'keyword' })
+        self.assertContains(response, "Guinier-Porod")
