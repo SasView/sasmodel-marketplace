@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
+from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from .backends.database import DatabaseStorage
 from django.dispatch import receiver
@@ -35,6 +37,19 @@ class SasviewModel(models.Model):
     verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
         related_name='models_verified')
     verfied_date = models.DateTimeField(null=True)
+
+    def verify(self, user):
+        if not user.is_staff:
+            raise PermissionDenied("Only staff have permission to verify models")
+        if not self.verified:
+            self.verified = True
+            self.verified_by = user
+            self.verfied_date = timezone.now()
+        else:
+            self.verified = False
+            self.verified_by = None
+            self.verfied_date = None
+        self.save()
 
     def __str__(self):
         return self.name

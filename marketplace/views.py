@@ -145,15 +145,7 @@ def verify(request, model_id):
             extra_tags="danger")
         return redirect('detail', model_id=model_id)
     model = get_object_or_404(SasviewModel, pk=model_id)
-    if model.verified:
-        model.verified = False
-        model.verified_by = None
-        model.verfied_date = None
-    else:
-        model.verified = True
-        model.verified_by = request.user
-        model.verfied_date = timezone.now()
-    model.save()
+    model.verify(request.user)
     action = "unverified"
     if model.verified: action = "verified"
     messages.success(request, "Model has been {}".format(action))
