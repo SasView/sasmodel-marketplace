@@ -2,3 +2,4 @@
 .vagrant
 sasmarket/settings.py
 attachments
+virtualenv
