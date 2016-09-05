@@ -3,4 +3,4 @@
 - [ ] Tests for filling in forms
 - [ ] Mail server for password reset?
 - [ ] Some kind of introductory text on index page
-- [ ] Add verified filter to search page
+- [x] Add verified filter to search page

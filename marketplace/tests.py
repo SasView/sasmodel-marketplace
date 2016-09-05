@@ -328,6 +328,7 @@ class CategoryTests(TestCase):
         model.refresh_from_db()
         self.assertIsNone(model.category)
 
+
 class SearchTests(TestCase):
 
     def test_search_name(self):
@@ -338,4 +339,18 @@ class SearchTests(TestCase):
     def test_search_description(self):
         model = create_model(name="Guinier-Porod", desc="Blah blah keyword blah")
         response = self.client.get(reverse('search'), { 'query': 'keyword' })
+        self.assertContains(response, "Guinier-Porod")
+
+    def test_search_verified(self):
+        model = create_model(name="Guinier-Porod", desc="Blah blah keyword blah")
+        staff = create_user()
+        staff.is_staff = True
+        staff.save()
+
+        response = self.client.get(reverse('search'), { 'query': 'keyword', 'verified': '1' })
+        self.assertContains(response, "no results")
+
+        model.verify(staff)
+
+        response = self.client.get(reverse('search'), { 'query': 'keyword', 'verified': '1' })
         self.assertContains(response, "Guinier-Porod")

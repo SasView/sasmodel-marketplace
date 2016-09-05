@@ -41,6 +41,14 @@ def search(request):
         query = request.GET['query']
         result_list = SasviewModel.objects.annotate(
             search=SearchVector('name', 'description')).filter(search=query)
+        verified_str = ""
+        if 'verified' in request.GET:
+            try:
+                verified_str = request.GET['verified']
+                verified = bool(int(verified_str))
+                result_list = result_list.filter(verified=verified)
+            except:
+                pass
     else:
         result_list = []
 
@@ -55,7 +63,7 @@ def search(request):
         results = paginator.page(paginator.num_pages)
 
     return render(request, 'marketplace/search.html',
-        { 'results': results, 'query': query })
+        { 'results': results, 'query': query, 'verified': verified_str })
 
 # Model views
 

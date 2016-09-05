@@ -20,6 +20,26 @@
 {% block content %}
 <h1>Search Models</h1>
 
+{% if query %}
+
+<form id="verified-form" action="{% url 'search' %}" method="get" style="float: right;">
+    <input type="hidden" name="query" value="{{ query }}">
+    Show:
+    <select name="verified">
+        <option value="" {% if not verified %}selected="selected"{% endif %}>All Models</option>
+        <option value="1" {% if verified == "1" %}selected="selected"{% endif %}>Verified Models</option>
+        <option value="0" {% if verified == "0" %}selected="selected"{% endif %}>Unverified Models</option>
+    </select>
+</form>
+
+<script type="text/javascript">
+    $('#verified-form select').change(function(event) {
+        $('#verified-form').submit();
+    });
+</script>
+{% endif %}
+
+
 {% if results and query %}
 <p>
     Your search for {{ query }} returned the following results:
