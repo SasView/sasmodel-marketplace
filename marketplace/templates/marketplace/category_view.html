@@ -44,6 +44,7 @@
         <th>Category</th>
         <th>Upload Date</th>
         <th>Author</th>
+        <th>Verified</th>
     </tr>
     </thead>
     <tbody>
@@ -54,6 +55,13 @@
         <td>{{ model.category|default_if_none:"None" }}</td>
         <td class="model-date">{{ model.upload_date|date:"d M Y" }}</td>
         <td>{{ model.owner.username }}</td>
+        <td align="center">
+            {% if model.verified %}
+                <span class="verified">{% bootstrap_icon 'ok' %}</span>
+            {% else %}
+                <span class="unverified">{% bootstrap_icon 'remove' %}</span>
+            {% endif %}
+        </td>
     </tr>
     {% endfor %}
     </tbody>

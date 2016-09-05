@@ -62,10 +62,10 @@ body {
     max-height: 110px;
 }
 
-#verified {
+.verified {
     color: #5cb85c;
 }
 
-#unverified {
+.unverified {
     color: #d9534f;
 }

@@ -56,9 +56,9 @@
         <td><b>Verified</b></td>
         <td>
             {% if model.verified %}
-                <span id="verified">{% bootstrap_icon 'ok' %} Verified by {{ model.verified_by.first_name }} {{ model.verified_by.last_name }} on {{ model.verfied_date|date:"d M Y" }}</span>
+                <span class="verified">{% bootstrap_icon 'ok' %} Verified by {{ model.verified_by.first_name }} {{ model.verified_by.last_name }} on {{ model.verfied_date|date:"d M Y" }}</span>
             {% else %}
-                <span id="unverified">{% bootstrap_icon 'remove' %} This model has not been verified by a member of the SasView team</span>
+                <span class="unverified">{% bootstrap_icon 'remove' %} This model has not been verified by a member of the SasView team</span>
             {% endif %}
         </td>
     </tr>

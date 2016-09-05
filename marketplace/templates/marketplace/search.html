@@ -53,6 +53,7 @@
         <th>Category</th>
         <th>Upload Date</th>
         <th>Author</th>
+        <th>Verified</th>
     </tr>
     </thead>
     <tbody>
@@ -62,7 +63,15 @@
         <td id="model-desc">{{ model.description_truncated }}</td>
         <td>{{ model.category|default_if_none:"none" }}</td>
         <td class="model-date">{{ model.upload_date|date:"d M Y" }}</td>
-        <td>{{ model.user.username }}</td>
+        <td><a href="{% url 'profile' user_id=model.owner.id %}">{{ model.owner.username }}</a></td>
+        <td align="center">
+            {% if model.verified %}
+                <span class="verified">{% bootstrap_icon 'ok' %}</span>
+            {% else %}
+                <span class="unverified">{% bootstrap_icon 'remove' %}</span>
+            {% endif %}
+
+        </td>
     </tr>
     </tbody>
     {% endfor %}
