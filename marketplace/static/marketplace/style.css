@@ -61,11 +61,3 @@ body {
 #comment-form div textarea {
     max-height: 110px;
 }
-
-#graph-container {
-    text-align: center;
-}
-
-#graph-container canvas {
-    display: inline;
-}

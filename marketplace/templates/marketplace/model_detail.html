@@ -41,9 +41,7 @@
     </p>
     {% if model.example_data_x and model.example_data_x %}
         <h2>Example Data:</h2>
-        <div id="graph-container">
-            <canvas id="example-graph" width="500" height="500"></canvas>
-        </div>
+        <canvas class="center-block" id="example-graph" width="500" height="500"></canvas>
         <script type="text/javascript">
             Chart.defaults.global.legend.display = false;
             var ctx = $("#example-graph");
