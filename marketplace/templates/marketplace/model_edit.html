@@ -19,7 +19,7 @@
 {% block content %}
 
 <h2>Edit Model:</h2>
-<form class="form" action="{% url 'edit' model_id=form.instance.id %}" method="post">
+<form class="form" action="{% url 'edit' model_id=form.instance.id %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% buttons %}

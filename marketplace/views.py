@@ -110,13 +110,21 @@ def view_category(request, slug=None):
 @login_required
 def create(request):
     if request.method == 'POST':
-        form = SasviewModelForm(request.POST)
+        form = SasviewModelForm(request.POST, request.FILES)
+        print request.FILES
         if form.is_valid():
             model = form.save(commit=False)
             model.owner = request.user
+            if form.cleaned_data['example_data']:
+                model.example_data_x = form.cleaned_data['example_data'][0]
+                model.example_data_y = form.cleaned_data['example_data'][1]
             model.save()
             messages.success(request, "Model successfully created.")
             return redirect('edit_files', model_id=model.id)
+        else:
+            print "Form has errors:"
+            print form.errors
+
     else:
         form = SasviewModelForm()
     return render(request, 'marketplace/model_create.html', { 'form': form })
@@ -127,11 +135,16 @@ def edit(request, model_id):
     if not isinstance(model, SasviewModel):
         return model
 
-    form = SasviewModelForm(request.POST or None, instance=model)
+    form = SasviewModelForm(request.POST or None, request.FILES or None,
+        instance=model)
     if request.method == 'POST':
 
         if form.is_valid():
-            model = form.save()
+            model = form.save(commit=False)
+            if form.cleaned_data['example_data']:
+                model.example_data_x = form.cleaned_data['example_data'][0]
+                model.example_data_y = form.cleaned_data['example_data'][1]
+            model.save()
             messages.success(request, "Model successfully updated.")
             return redirect(model)
 

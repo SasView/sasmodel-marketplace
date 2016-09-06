@@ -5,6 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from .backends.database import DatabaseStorage
+from .validators import validate_comma_separated_float_list
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete
 
@@ -31,6 +32,10 @@ class SasviewModel(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     upload_date = models.DateTimeField(verbose_name='Date Published',
         auto_now_add=True)
+    example_data_x = models.CharField(validators=[validate_comma_separated_float_list],
+        max_length=500, null=True)
+    example_data_y = models.CharField(validators=[validate_comma_separated_float_list],
+        max_length=500, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     verified = models.BooleanField(default=False)
@@ -59,6 +64,17 @@ class SasviewModel(models.Model):
 
     def description_truncated(self):
         return truncate(self.description, 200)
+
+    def example_data_json(self):
+        if self.example_data_x is None or self.example_data_y is None:
+            return "[]"
+        json = "["
+        x_data = self.example_data_x.split(",")
+        y_data = self.example_data_y.split(",")
+        for point in zip(x_data, y_data):
+            json += "{" + "x: " + point[0] + ", y: " + point[1] + "},"
+        json += "]"
+        return json
 
 @python_2_unicode_compatible
 class ModelFile(models.Model):

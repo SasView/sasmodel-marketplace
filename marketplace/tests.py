@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from marketplace.models import SasviewModel, ModelFile, Comment, Category
+from marketplace.forms import SasviewModelForm
 
 def create_user(username=None, email=None, password="testpassword",
     commit=True, sign_in=False, client=None):
@@ -84,6 +85,26 @@ class SasviewModelTests(TestCase):
         user.delete()
         all_models = SasviewModel.objects.all()
         self.assertEqual(len(all_models), 0)
+
+    def test_upload_example_data(self):
+        model = create_model()
+        post_dict = {
+            'name': model.name,
+            'description': model.description,
+            'category': None
+        }
+        upload = open('marketplace/test_data/M1 [guinier]_out.txt', 'rb')
+        file_dict = { 'example_data': SimpleUploadedFile(upload.name, upload.read()) }
+        form = SasviewModelForm(post_dict, file_dict)
+
+        self.assertTrue(form.is_valid())
+        model.example_data_x = form.cleaned_data['example_data'][0]
+        model.example_data_y = form.cleaned_data['example_data'][1]
+        model.save()
+        
+        # Ensure file is parsed and saved correctly
+        self.assertTrue(model.example_data_x.startswith("0.0005,0.0106939,0.02"))
+        self.assertTrue(model.example_data_y.startswith("1.0007,0.872769,0.593"))
 
 
 class ModelFileTests(TestCase):
