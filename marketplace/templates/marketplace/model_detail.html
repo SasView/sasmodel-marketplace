@@ -6,6 +6,9 @@
   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
 </script>
 <script type="text/javascript">
+    $(function() {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
     window.MathJax = ({
         elements: ["model-desc"],
         tex2jax: {
@@ -183,7 +186,7 @@
             </div>
             {% if comment.user == request.user %}
             <div class="actions">
-                <a href="{% url 'delete_comment' comment_id=comment.id %}" class="btn btn-danger btn-sm">Delete Comment</a>
+                    <a class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Delete comment" href="{% url 'delete_comment' comment_id=comment.id %}">{% bootstrap_icon 'remove' %}</a>
             </div>
             {% endif %}
         </div>
