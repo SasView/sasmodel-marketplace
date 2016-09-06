@@ -1,5 +1,6 @@
 *.pyc
 .vagrant
 sasmarket/settings.py
+sasmarket/static
 attachments
 virtualenv
