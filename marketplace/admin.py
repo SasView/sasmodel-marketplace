@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import SasviewModel, ModelFile, Comment, Category
+from .models import SasviewModel, ModelFile, Comment, Category
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):

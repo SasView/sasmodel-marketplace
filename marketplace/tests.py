@@ -35,7 +35,7 @@ def create_model(user=None, name="Model", desc="Description", category=None, com
 def create_file(model=None, name='model_name.py', commit=True):
     if model is None:
         model = create_model()
-    f = SimpleUploadedFile(name, 'class MyModel(Model):\n  def__init__(self):\n    print("init")')
+    f = SimpleUploadedFile(name, bytes('class MyModel(Model):\n  def__init__(self):\n    print("init")', 'UTF-8'))
     model_file = ModelFile(name=name, model=model, model_file=f)
 
     if commit:
