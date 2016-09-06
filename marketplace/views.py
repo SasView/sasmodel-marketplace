@@ -111,7 +111,6 @@ def view_category(request, slug=None):
 def create(request):
     if request.method == 'POST':
         form = SasviewModelForm(request.POST, request.FILES)
-        print request.FILES
         if form.is_valid():
             model = form.save(commit=False)
             model.owner = request.user
@@ -121,9 +120,6 @@ def create(request):
             model.save()
             messages.success(request, "Model successfully created.")
             return redirect('edit_files', model_id=model.id)
-        else:
-            print "Form has errors:"
-            print form.errors
 
     else:
         form = SasviewModelForm()
