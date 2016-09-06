@@ -66,9 +66,9 @@
         <td><a href="{% url 'profile' user_id=model.owner.id %}">{{ model.owner.username }}</a></td>
         <td align="center">
             {% if model.verified %}
-                <span class="verified">{% bootstrap_icon 'ok' %}</span>
+                <span class="text-success">{% bootstrap_icon 'ok' %}</span>
             {% else %}
-                <span class="unverified">{% bootstrap_icon 'remove' %}</span>
+                <span class="text-danger">{% bootstrap_icon 'remove' %}</span>
             {% endif %}
 
         </td>
