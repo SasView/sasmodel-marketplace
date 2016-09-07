@@ -179,7 +179,7 @@ def new_comment(request):
                 'content': comment.content,
                 'user': comment.user.username,
                 'time': comment.time.strftime("%a %d %b %Y at %H:%M"),
-                'deleteURL': reverse('delete_comment'),
+                'time_millis': int(comment.time.strftime("%s")) * 1000,
                 'id': comment.id
             }
             return JsonResponse(json)
@@ -224,7 +224,7 @@ def get_new_comments(request):
                 'content': comment.content,
                 'user': comment.user.username,
                 'time': comment.time.strftime("%a %d %b %Y at %H:%M"),
-                'deleteURL': reverse('delete_comment'),
+                'time_millis': int(comment.time.strftime("%s")) * 1000,
                 'id': comment.id
             })
         return JsonResponse({ 'comments': comment_json })

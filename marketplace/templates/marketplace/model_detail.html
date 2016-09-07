@@ -18,9 +18,12 @@
     });
 </script>
 <script type="text/javascript">
+    window.postedComments = [];
+    window.fetchedComments = [];
+
     var addComment = function(comment) {
         var commentHtml = $([
-            "<div class='comment well'>",
+            "<div class='comment well' data-comment-id='" + comment['id'] + "'>",
             "    <div class='detail-container'>",
             "        <div class='user'>",
             "            " + comment['user'],
@@ -32,11 +35,16 @@
             "    <div class='content'>",
             "        " + comment['content'],
             "    </div>",
-            "    <div class='actions'>",
-            "        <a class='btn btn-danger delete-comment-btn' data-toggle='tooltip' data-placement='right' title='Delete comment' data-comment-id='" + comment['id'] + "' href='#comment-section'><span class='glyphicon glyphicon-remove'></span></a>",
-            "    </div>",
             "</div>"
         ].join('\n'));
+
+        if (comment['canDelete'] === true) {
+            commentHtml.append($([
+                "    <div class='actions'>",
+                "        <a class='btn btn-danger delete-comment-btn' data-toggle='tooltip' data-placement='right' title='Delete comment' href='#comment-section'><span class='glyphicon glyphicon-remove'></span></a>",
+                "    </div>",
+            ].join("\n")));
+        }
 
         var container = $('#comment-container');
         var firstChild = $(container.children()[0])
@@ -49,7 +57,7 @@
     var removeComment = function(commentWell) {
         var commentContainer = $(commentWell.parent());
         commentWell.html('<p>Comment deleted.</p>');
-        commentWell.delay(1500).fadeOut(400, function() {
+        commentWell.delay(1000).fadeOut(400, function() {
             $(this).remove();
             if (commentContainer.find('div').length === 0) {
                 commentContainer.html($("<p>No comments yet.</p>"));
@@ -69,9 +77,8 @@
 
             success: function(json) {
                 var comments = json['comments'];
-                for (var i in comments) {
-                    addComment(comments[i]);
-                }
+                window.fetchedComments = comments;
+                updateComments();
             },
 
             error: function(xhr, errmsg, err) {
@@ -81,6 +88,32 @@
         lastPoll = new Date();
     };
     setInterval(fetchNewComments, 30000);
+
+    var updateComments = function() {
+        var sortByTime = function(a ,b) {
+            var dateA = new Date(a['time_millis']);
+            var dateB = new Date(b['time_millis']);
+            if (dateA < dateB)
+                return -1;
+            if (dateA > dateB)
+                return 1;
+            return 0;
+        };
+
+        if (window.fetchedComments.length > 0 || window.postedComments.length > 0) {
+            for (var i in window.postedComments) {
+                var comment = window.postedComments[i];
+                 $('div[data-comment-id=' + comment['id'] + ']').remove();
+            }
+        }
+        var newComments = window.postedComments.concat(window.fetchedComments);
+        newComments.sort(sortByTime);
+        for (var i in newComments) {
+            addComment(newComments[i]);
+        }
+        window.postedComments = [];
+        window.fetchedComments = [];
+    };
 </script>
 {% if model.example_data_json != "[]" %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.bundle.min.js"></script>
@@ -238,7 +271,7 @@
 <div id="comment-container">
 {% if comments %}
     {% for comment in comments %}
-        <div class="comment well">
+        <div class="comment well" data-comment-id="{{ comment.id }}">
             <div class="detail-container">
                 <div class="user">
                     {{ comment.user.username }}:
@@ -252,7 +285,7 @@
             </div>
             {% if comment.user == request.user %}
             <div class="actions">
-                    <a class="btn btn-danger delete-comment-btn" data-toggle="tooltip" data-placement="right" title="Delete comment" data-comment-id="{{ comment.id }}" href="#comment-container">{% bootstrap_icon 'remove' %}</a>
+                    <a class="btn btn-danger delete-comment-btn" data-toggle="tooltip" data-placement="right" title="Delete comment" href="#comment-container">{% bootstrap_icon 'remove' %}</a>
             </div>
             {% endif %}
         </div>
@@ -261,7 +294,9 @@
         $('#comment-container').on('click', '.actions .delete-comment-btn', function(event) {
             var button = $(event.toElement);
             if (!button.is('a')) button = button.parent();
-            var comment_id = button.attr('data-comment-id');
+            var commentWell = button.parent().parent();
+            var comment_id = commentWell.attr('data-comment-id');
+            console.log(comment_id);
             var csrfInput = $("{% csrf_token %}");
             $.ajax({
                 url: "{% url 'delete_comment' %}",
@@ -314,7 +349,6 @@
     <script type="text/javascript">
         $('#id_model').parent().hide();
         $('#post-comment').click(function(event) {
-            fetchNewComments();
             event.preventDefault();
             var formGroup = $('#id_content').parent()
             // Trim whitespace
@@ -370,7 +404,10 @@
                         return;
                     }
                     // Comment posted
+                    json['canDelete'] = true;
+                    window.postedComments = window.postedComments.concat(json);
                     addComment(json);
+                    fetchNewComments();
                 },
                 error: function(xhr, errmsg, err) {
                     console.log(xhr.status + ": " + xhr.responseText);
