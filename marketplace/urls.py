@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^uploads/(?P<filename>.*)$', views.download_file, name='download_file'),
     url(r'^comments/new/$', views.new_comment, name='new_comment'),
     url(r'^comments/delete/$', views.delete_comment, name='delete_comment'),
+    url(r'^comments/fetch/$', views.get_new_comments, name='get_new_comments'),
     url(r'^accounts/signup/$', views.sign_up, name='signup'),
     url(r'^accounts/login/$', auth_views.login, name='login'),
     url(r'^accounts/logout/$', auth_views.logout, { 'next_page': views.index }, name='logout'),

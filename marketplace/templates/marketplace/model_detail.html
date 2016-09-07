@@ -17,6 +17,71 @@
         }
     });
 </script>
+<script type="text/javascript">
+    var addComment = function(comment) {
+        var commentHtml = $([
+            "<div class='comment well'>",
+            "    <div class='detail-container'>",
+            "        <div class='user'>",
+            "            " + comment['user'],
+            "        </div>",
+            "        <div class='time'>",
+            "            " + comment['time'],
+            "        </div>",
+            "    </div>",
+            "    <div class='content'>",
+            "        " + comment['content'],
+            "    </div>",
+            "    <div class='actions'>",
+            "        <a class='btn btn-danger delete-comment-btn' data-toggle='tooltip' data-placement='right' title='Delete comment' data-comment-id='" + comment['id'] + "' href='#comment-section'><span class='glyphicon glyphicon-remove'></span></a>",
+            "    </div>",
+            "</div>"
+        ].join('\n'));
+
+        var container = $('#comment-container');
+        var firstChild = $(container.children()[0])
+        if (firstChild.is('p')) {
+            container.html('');
+        }
+        container.append(commentHtml);
+    };
+
+    var removeComment = function(commentWell) {
+        var commentContainer = $(commentWell.parent());
+        commentWell.html('<p>Comment deleted.</p>');
+        commentWell.delay(1500).fadeOut(400, function() {
+            $(this).remove();
+            if (commentContainer.find('div').length === 0) {
+                commentContainer.html($("<p>No comments yet.</p>"));
+            }
+        });
+    };
+
+    var lastPoll = new Date();
+    var fetchNewComments = function() {
+        $.ajax({
+            url: "{% url 'get_new_comments' %}",
+            type: "GET",
+            data: {
+                model: "{{ model.id }}",
+                since: lastPoll.getTime()
+            },
+
+            success: function(json) {
+                var comments = json['comments'];
+                for (var i in comments) {
+                    addComment(comments[i]);
+                }
+            },
+
+            error: function(xhr, errmsg, err) {
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+        });
+        lastPoll = new Date();
+    };
+    setInterval(fetchNewComments, 30000);
+</script>
 {% if model.example_data_json != "[]" %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.2/Chart.bundle.min.js"></script>
 {% endif %}
@@ -209,15 +274,7 @@
                 success: function(json) {
                     if (json['success']) {
                         var commentWell = button.parent().parent();
-                        var commentContainer = $(commentWell.parent());
-                        commentWell.html('<p>Comment deleted.</p>');
-                        commentWell.delay(1500).fadeOut(400, function() {
-                            $(this).remove();
-                            if (commentContainer.find('div').length === 0) {
-                                commentContainer.html($("<p>No comments yet.</p>"));
-                            }
-                        });
-
+                        removeComment(commentWell);
                     } else {
                         for (var i in json['errors']) {
                             var errmsg = json['errors'][i];
@@ -257,6 +314,7 @@
     <script type="text/javascript">
         $('#id_model').parent().hide();
         $('#post-comment').click(function(event) {
+            fetchNewComments();
             event.preventDefault();
             var formGroup = $('#id_content').parent()
             // Trim whitespace
@@ -312,32 +370,7 @@
                         return;
                     }
                     // Comment posted
-                    var comment = json;
-                    var commentHtml = $([
-                        "<div class='comment well'>",
-                        "    <div class='detail-container'>",
-                        "        <div class='user'>",
-                        "            " + comment['user'],
-                        "        </div>",
-                        "        <div class='time'>",
-                        "            " + comment['time'],
-                        "        </div>",
-                        "    </div>",
-                        "    <div class='content'>",
-                        "        " + comment['content'],
-                        "    </div>",
-                        "    <div class='actions'>",
-                        "        <a class='btn btn-danger delete-comment-btn' data-toggle='tooltip' data-placement='right' title='Delete comment' data-comment-id='" + comment['id'] + "' href='#comment-section'><span class='glyphicon glyphicon-remove'></span></a>",
-                        "    </div>",
-                        "</div>"
-                    ].join('\n'));
-
-                    var container = $('#comment-container');
-                    var firstChild = $(container.children()[0])
-                    if (firstChild.is('p')) {
-                        container.html('');
-                    }
-                    container.append(commentHtml);
+                    addComment(json);
                 },
                 error: function(xhr, errmsg, err) {
                     console.log(xhr.status + ": " + xhr.responseText);

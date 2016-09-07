@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.http import Http404
+from django.http import HttpResponseServerError
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth import login
@@ -202,6 +203,31 @@ def delete_comment(request):
         comment.delete()
         return JsonResponse({ 'success': True })
     raise Http404("Invalid request")
+
+def get_new_comments(request):
+    if request.method == 'GET':
+        try:
+            model_id = int(request.GET['model'])
+            # Javascript time is in milliseconds, Python uses seconds
+            millisecons = int(request.GET['since'])
+            seconds = int(millisecons/1000)
+        except:
+            return HttpResponseServerError("Invalid request")
+
+        since = timezone.datetime.fromtimestamp(seconds)
+        new_comments = Comment.objects.filter(model__id=model_id, time__gt=since).order_by("time")
+        comment_json = []
+        for comment in new_comments:
+            if comment.user == request.user:
+                continue
+            comment_json.append({
+                'content': comment.content,
+                'user': comment.user.username,
+                'time': comment.time.strftime("%a %d %b %Y at %H:%M"),
+                'deleteURL': reverse('delete_comment'),
+                'id': comment.id
+            })
+        return JsonResponse({ 'comments': comment_json })
 
 
 

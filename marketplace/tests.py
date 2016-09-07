@@ -179,7 +179,7 @@ class UserTests(TestCase):
             kwargs={ 'model_id': model.id }))
         self.assertContains(response, "My Model")
         self.assertNotContains(response, "Edit Details")
-        self.assertNotContains(response, "Delete")
+        self.assertNotContains(response, "</span> Delete")
 
         self.client.force_login(user)
 
@@ -187,7 +187,7 @@ class UserTests(TestCase):
             kwargs={ 'model_id': model.id }))
         self.assertContains(response, "My Model")
         self.assertContains(response, "Edit Details")
-        self.assertContains(response, "Delete")
+        self.assertContains(response, "</span> Delete")
 
     def test_edit_permissions(self):
         owner = create_user()
