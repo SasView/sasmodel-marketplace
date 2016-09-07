@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.http import Http404
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth import login
@@ -177,13 +178,31 @@ def new_comment(request):
                 'content': comment.content,
                 'user': comment.user.username,
                 'time': comment.time.strftime("%a %d %b %Y at %H:%M"),
-                'deleteURL': reverse('delete_comment', kwargs={'comment_id': comment.id})
+                'deleteURL': reverse('delete_comment'),
+                'id': comment.id
             }
             return JsonResponse(json)
         else:
             return JsonResponse({ 'errors': form.errors })
 
-    return HttpResponse("Invalid request")
+    raise Http404("Invalid request")
+
+def delete_comment(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({ 'success': False,
+            'errors': ['You must be logged in to delete this comment.'] })
+    if request.method == 'POST':
+        comment = Comment.objects.filter(pk=request.POST['comment_id']).first()
+        if comment is None:
+            return JsonResponse({ 'success': False,
+                'errors': { 'comment': 'Comment does not exist' } })
+        if comment.user != request.user:
+            return JsonResponse({ 'success': False,
+                'errors': ['You are not authorised to delete this comment.'] })
+        comment.delete()
+        return JsonResponse({ 'success': True })
+    raise Http404("Invalid request")
+
 
 
 # Model file views
@@ -241,19 +260,6 @@ def edit_files(request, model_id):
             return redirect('edit_files', model_id=model_id)
     return render(request, 'marketplace/model_file_edit.html',
         { 'model': model, 'files': files, 'form': form })
-
-# Comment views
-
-@login_required
-def delete_comment(request, comment_id):
-    comment = Comment.objects.filter(pk=comment_id).first()
-    if comment.user != request.user:
-        messages.error(request, "You are not authorised to delete this comment",
-            extra_tags="danger")
-    else:
-        comment.delete()
-        messages.success(request, "Comment successfully deleted.")
-    return redirect('detail', model_id=comment.model.id)
 
 # User views
 

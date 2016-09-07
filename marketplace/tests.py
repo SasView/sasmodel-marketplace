@@ -101,7 +101,7 @@ class SasviewModelTests(TestCase):
         model.example_data_x = form.cleaned_data['example_data'][0]
         model.example_data_y = form.cleaned_data['example_data'][1]
         model.save()
-        
+
         # Ensure file is parsed and saved correctly
         self.assertTrue(model.example_data_x.startswith("0.0005,0.0106939,0.02"))
         self.assertTrue(model.example_data_y.startswith("1.0007,0.872769,0.593"))
@@ -264,28 +264,6 @@ class UserTests(TestCase):
             kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
         my_files = ModelFile.objects.filter(model__pk=model.id)
         self.assertEqual(len(my_files), 0)
-
-    def test_comment_delete_permission(self):
-        owner = create_user()
-        comment = create_comment(user=owner)
-        current = create_user(sign_in=True, client=self.client)
-
-        # Check unauthorised user can't delete
-        response = self.client.get(reverse('delete_comment',
-            kwargs={ 'comment_id': comment.id }))
-        self.assertRedirects(response, reverse('detail',
-            kwargs={ 'model_id': comment.model.id }))
-        my_comments = Comment.objects.filter(user__pk=owner.id)
-        self.assertEqual(len(my_comments), 1)
-
-        # Check authorised user can delete
-        self.client.force_login(owner)
-        response = self.client.get(reverse('delete_comment',
-            kwargs={ 'comment_id': comment.id }))
-        self.assertRedirects(response, reverse('detail',
-            kwargs={ 'model_id': comment.model.id }))
-        my_comments = Comment.objects.filter(user__pk=owner.id)
-        self.assertEqual(len(my_comments), 0)
 
     def test_verification_permissions(self):
         user = create_user(sign_in=True, client=self.client)

@@ -151,8 +151,8 @@
 
 <script type="text/javascript">
     $('.delete-btn').click(function(event) {
-        modelName = "{{ model.name }}";
-        deleteUrl = "{% url 'delete' model_id=model.id %}";
+        var modelName = "{{ model.name }}";
+        var deleteUrl = "{% url 'delete' model_id=model.id %}";
         $('#del-modal-content').text("Are you sure you want to delete " + modelName + "?");
         $('#modal-del-btn').attr('href', deleteUrl);
     });
@@ -187,11 +187,57 @@
             </div>
             {% if comment.user == request.user %}
             <div class="actions">
-                    <a class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Delete comment" href="{% url 'delete_comment' comment_id=comment.id %}">{% bootstrap_icon 'remove' %}</a>
+                    <a class="btn btn-danger delete-comment-btn" data-toggle="tooltip" data-placement="right" title="Delete comment" data-comment-id="{{ comment.id }}" href="#comment-container">{% bootstrap_icon 'remove' %}</a>
             </div>
             {% endif %}
         </div>
     {% endfor %}
+    <script type="text/javascript">
+        $('#comment-container').on('click', '.actions .delete-comment-btn', function(event) {
+            var button = $(event.toElement);
+            if (!button.is('a')) button = button.parent();
+            var comment_id = button.attr('data-comment-id');
+            var csrfInput = $("{% csrf_token %}");
+            $.ajax({
+                url: "{% url 'delete_comment' %}",
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': csrfInput.attr('value'),
+                    'comment_id': comment_id
+                },
+
+                success: function(json) {
+                    if (json['success']) {
+                        var commentWell = button.parent().parent();
+                        var commentContainer = $(commentWell.parent());
+                        commentWell.html('<p>Comment deleted.</p>');
+                        commentWell.delay(1500).fadeOut(400, function() {
+                            $(this).remove();
+                            if (commentContainer.find('div').length === 0) {
+                                commentContainer.html($("<p>No comments yet.</p>"));
+                            }
+                        });
+
+                    } else {
+                        for (var i in json['errors']) {
+                            var errmsg = json['errors'][i];
+                            var errorAlert = $([
+                                "<div class='alert alert-danger alert-dismissable'>",
+                                "    <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>x</button>",
+                                "    " + errmsg,
+                                "</div>"
+                            ].join("\n"));
+                            $($('.container')[1]).prepend(errorAlert);
+                        }
+                    }
+                },
+
+                error:function(xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        });
+    </script>
 
 {% else %}
     <p>
@@ -236,7 +282,6 @@
 
                 success: function(json) {
                     $('#id_content').val('');
-                    console.log(json);
                     // Error message
                     if (json['authenticated'] === false) {
                         console.log("User not authenticated");
@@ -263,12 +308,10 @@
                                 "</div>"
                             ].join("\n"));
                             $($('.container')[1]).prepend(errorAlert);
-                            console.log(json);
                         }
                         return;
                     }
                     // Comment posted
-                    console.log("Making comment");
                     var comment = json;
                     var commentHtml = $([
                         "<div class='comment well'>",
@@ -284,11 +327,11 @@
                         "        " + comment['content'],
                         "    </div>",
                         "    <div class='actions'>",
-                        "        <a class='btn btn-danger' data-toggle='tooltip' data-placement='right' title='Delete comment' href='" + comment['deleteURL'] + "'><span class='glyphicon glyphicon-remove'></span></a>",
+                        "        <a class='btn btn-danger delete-comment-btn' data-toggle='tooltip' data-placement='right' title='Delete comment' data-comment-id='" + comment['id'] + "' href='#comment-section'><span class='glyphicon glyphicon-remove'></span></a>",
                         "    </div>",
                         "</div>"
                     ].join('\n'));
-                    console.log(commentHtml);
+
                     var container = $('#comment-container');
                     var firstChild = $(container.children()[0])
                     if (firstChild.is('p')) {
