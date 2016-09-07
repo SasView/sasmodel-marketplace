@@ -1,14 +1,18 @@
+import simplejson
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.http import HttpResponse
+from django.http import JsonResponse
+from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import SearchVector
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core import serializers
 from .forms import SignupForm
 from .forms import SasviewModelForm
 from .forms import ModelFileForm
@@ -71,18 +75,7 @@ def detail(request, model_id):
     model = get_object_or_404(SasviewModel, pk=model_id)
     files = ModelFile.objects.filter(model__pk=model.id)
     comments = Comment.objects.filter(model__pk=model.id)
-    form = CommentForm(request.POST or None)
-    if request.method == 'POST':
-        if not request.user.is_authenticated:
-            messages.error(request, "You must log in to post a comment.",
-                extra_tags="danger")
-            form = CommentForm()
-        elif form.is_valid():
-            comment = form.save(commit=False)
-            comment.model = model
-            comment.user = request.user
-            comment.save()
-            form = CommentForm()
+    form = CommentForm()
     return render(request, 'marketplace/model_detail.html',
         { 'model': model, 'files': files, 'comments': comments, 'form': form })
 
@@ -167,6 +160,30 @@ def verify(request, model_id):
     if model.verified: action = "verified"
     messages.success(request, "Model has been {}".format(action))
     return redirect('detail', model_id=model.id)
+
+# Comment API
+
+def new_comment(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({ 'authenticated': False })
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.time = timezone.now()
+            comment.save()
+            json = {
+                'content': comment.content,
+                'user': comment.user.username,
+                'time': comment.time.strftime("%a %d %b %Y at %H:%M"),
+                'deleteURL': reverse('delete_comment', kwargs={'comment_id': comment.id})
+            }
+            return JsonResponse(json)
+        else:
+            return JsonResponse({ 'errors': form.errors })
+
+    return HttpResponse("Invalid request")
 
 
 # Model file views

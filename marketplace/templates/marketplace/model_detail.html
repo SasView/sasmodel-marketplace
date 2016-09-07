@@ -170,6 +170,7 @@
 {% endif %}
 
 <h3>Comments:</h3>
+<div id="comment-container">
 {% if comments %}
     {% for comment in comments %}
         <div class="comment well">
@@ -197,15 +198,110 @@
         No comments yet.
     </p>
 {% endif %}
+</div>
 
 {% if request.user.is_authenticated %}
-    <form class="form" action="{% url 'detail' model_id=model.id %}" method="post" id="comment-form">
+    <form class="form" id="comment-form">
         {% csrf_token %}
         {% bootstrap_form form %}
         {% buttons %}
-            <button type="submit" class="btn btn-primary">{% bootstrap_icon 'comment' %} Post Comment</button>
+            <button type="submit" class="btn btn-primary" id="post-comment">{% bootstrap_icon 'comment' %} Post Comment</button>
         {% endbuttons %}
     </form>
+    <script type="text/javascript">
+        $('#id_model').parent().hide();
+        $('#post-comment').click(function(event) {
+            event.preventDefault();
+            var formGroup = $('#id_content').parent()
+            // Trim whitespace
+            var content = $('#id_content').val().replace(/^\s+|\s+$/g, '');
+            if (content === '') {
+                formGroup.addClass('has-error');
+                formGroup.append($([
+                    "<span class='help-block'>Please enter a comment.</span>"
+                ].join('\n')));
+                return;
+            } else {
+                formGroup.removeClass('has-error');
+                formGroup.find('span').remove();
+            }
+            $.ajax({
+                url: '{% url 'new_comment' %}',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': $('#comment-form input').attr('value'),
+                    'content': $('#id_content').val(),
+                    'model': {{ model.id }}
+                },
+
+                success: function(json) {
+                    $('#id_content').val('');
+                    console.log(json);
+                    // Error message
+                    if (json['authenticated'] === false) {
+                        console.log("User not authenticated");
+                        var errorAlert = $([
+                            "<div class='alert alert-danger alert-dismissable'>",
+                            "    <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>x</button>",
+                            "    You must log in to post a comment.",
+                            "</div>"
+                        ].join("\n"));
+                        $($('.container')[1]).prepend(errorAlert);
+                        return;
+                    } else if (json['errors'] !== undefined) {
+                        var err_msg = json['errors']['content'][0]
+                        if (err_msg !== undefined) {
+                            formGroup.addClass('has-error');
+                            formGroup.append($([
+                                "<span class='help-block'>" + err_msg + "</span>"
+                            ].join('\n')));
+                        } else {
+                            var errorAlert = $([
+                                "<div class='alert alert-danger alert-dismissable'>",
+                                "    <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>x</button>",
+                                "    Error posting comment.",
+                                "</div>"
+                            ].join("\n"));
+                            $($('.container')[1]).prepend(errorAlert);
+                            console.log(json);
+                        }
+                        return;
+                    }
+                    // Comment posted
+                    console.log("Making comment");
+                    var comment = json;
+                    var commentHtml = $([
+                        "<div class='comment well'>",
+                        "    <div class='detail-container'>",
+                        "        <div class='user'>",
+                        "            " + comment['user'],
+                        "        </div>",
+                        "        <div class='time'>",
+                        "            " + comment['time'],
+                        "        </div>",
+                        "    </div>",
+                        "    <div class='content'>",
+                        "        " + comment['content'],
+                        "    </div>",
+                        "    <div class='actions'>",
+                        "        <a class='btn btn-danger' data-toggle='tooltip' data-placement='right' title='Delete comment' href='" + comment['deleteURL'] + "'><span class='glyphicon glyphicon-remove'></span></a>",
+                        "    </div>",
+                        "</div>"
+                    ].join('\n'));
+                    console.log(commentHtml);
+                    var container = $('#comment-container');
+                    var firstChild = $(container.children()[0])
+                    if (firstChild.is('p')) {
+                        container.html('');
+                    }
+                    container.append(commentHtml);
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        });
+    </script>
 {% else %}
     <p>
         Please log in to add a comment.

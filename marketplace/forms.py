@@ -100,9 +100,10 @@ class ModelFileForm(ModelForm):
         labels = { "model_file": "Upload a model file:" }
 
 class CommentForm(ModelForm):
+    model = forms.ModelChoiceField(queryset=SasviewModel.objects.all(), required=False)
     class Meta:
         model = Comment
-        fields = ("content",)
+        fields = ("content", "model")
         labels = { "content": "Add a comment:" }
 
 class SignupForm(UserCreationForm):
