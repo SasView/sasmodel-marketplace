@@ -71,7 +71,7 @@ class DatabaseStorage(Storage):
         binary = psycopg2.Binary(content.read())
         size = binary.__sizeof__()
 
-        connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
+        connection = psycopg2.connect("dbname={} user={} password={}".format(self.DATABASE_NAME, self.DATABASE_USER, self.DATABASE_PASSWD))
         cursor = connection.cursor()
 
         #todo: check result and do something (exception?) if failed.
@@ -90,7 +90,7 @@ class DatabaseStorage(Storage):
     def exists(self, name, cursor=None):
         cursor_supplied = (cursor is not None)
         if not cursor_supplied:
-            connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
+            connection = psycopg2.connect("dbname={} user={} password={}".format(self.DATABASE_NAME, self.DATABASE_USER, self.DATABASE_PASSWD))
             cursor = connection.cursor()
 
         cursor.execute("SELECT {} FROM {} WHERE {} = '{}'".format(self.fname_column,self.db_table,self.fname_column,name))
@@ -117,7 +117,7 @@ class DatabaseStorage(Storage):
         return name
 
     def delete(self, name):
-        connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
+        connection = psycopg2.connect("dbname={} user={} password={}".format(self.DATABASE_NAME, self.DATABASE_USER, self.DATABASE_PASSWD))
         cursor = connection.cursor()
         if self.exists(name, cursor):
             cursor.execute("DELETE FROM {} WHERE {} = '{}'".format(self.db_table,self.fname_column,name))
@@ -131,7 +131,7 @@ class DatabaseStorage(Storage):
         return urlparse.urljoin(self.base_url, name).replace('\\', '/')
 
     def size(self, name):
-        connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
+        connection = psycopg2.connect("dbname={} user={} password={}".format(self.DATABASE_NAME, self.DATABASE_USER, self.DATABASE_PASSWD))
         cursor = connection.cursor()
 
         cursor.execute("SELECT {} from {} where {} = '{}'".format(self.size_column,self.db_table,self.fname_column,name))
