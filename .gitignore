@@ -1,6 +1,6 @@
 *.pyc
 .vagrant
-.travis
+.travis/*.pem
 sasmarket/settings.py
 sasmarket/static
 attachments
