@@ -22,6 +22,6 @@ script: python manage.py test marketplace
 deploy:
   skip_cleanup: true
   provider: script
-  script: ./deploy.sh
+  script: /bin/sh -xe ./deploy.sh
   on:
     branch: master
