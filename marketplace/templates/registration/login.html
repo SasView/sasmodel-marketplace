@@ -12,6 +12,7 @@
     {% endbuttons %}
     <input type="hidden" name="next" value="{{ next }}" />
 </form>
-<p>Don't have an account? <a href="{% url 'signup' %}">Sign up!</a>
+<p>Don't have an account? <a href="{% url 'signup' %}">Sign up!</a></p>
+<p>Forgotten you password? Email <a href="mailto:help@sasview.org">help@sasview.org</a> and one of the admins will reset it for you.</p>
 
 {% endblock content %}
