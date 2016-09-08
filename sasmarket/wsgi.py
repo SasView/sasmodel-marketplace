@@ -12,7 +12,11 @@ import time
 import traceback
 import signal
 import sys
+import monitor
 from django.core.wsgi import get_wsgi_application
+
+monitor.start()
+monitor.track(os.path.abspath(__file__))
 
 try:
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sasmarket.settings")
@@ -25,4 +29,3 @@ except:
         traceback.print_exc()
         os.kill(os.getpid(), signal.SIGINT)
         time.sleep(2.5)
-
