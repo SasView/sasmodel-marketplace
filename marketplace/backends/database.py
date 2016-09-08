@@ -16,6 +16,7 @@ from django.core.files import File
 from django.core.files.storage import Storage
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
+import psycopg2
 
 @deconstructible
 class DatabaseStorage(Storage):
