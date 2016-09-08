@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 eval "$(ssh-agent -s)"
 chmod 600 .travis/travis_rsa
 ssh-add .travis/travis_rsa
