@@ -34,6 +34,7 @@ class DatabaseStorage(Storage):
         #get database settings
         self.DATABASE_NAME = settings.DATABASES['default']['NAME']
         self.DATABASE_USER = settings.DATABASES['default']['USER']
+        self.DATABASE_PASSWD = settings.DATABASES['default']['PASSWORD']
 
     def _open(self, name, mode='rb'):
         """Open a file from database.
@@ -43,7 +44,7 @@ class DatabaseStorage(Storage):
         """
         assert mode == 'rb', "You've tried to open binary file without specifying binary mode! You specified: %s"%mode
 
-        connection = psycopg2.connect("dbname={} user={}".format(self.DATABASE_NAME, self.DATABASE_USER))
+        connection = psycopg2.connect("dbname={} user={} password={}".format(self.DATABASE_NAME, self.DATABASE_USER, self.DATABASE_PASSWD))
         cursor = connection.cursor()
 
         cursor.execute("SELECT {} FROM {} WHERE {} = '{}'".format(self.blob_column,self.db_table,self.fname_column,name))
