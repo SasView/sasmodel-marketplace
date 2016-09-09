@@ -21,7 +21,7 @@
 </table>
 {% if user == request.user %}
 <p>
-    <a class="btn btn-primary" href="{% url 'password_change' %}">Change Password</a>
+    <a class="btn btn-default" href="{% url 'password_change' %}">{% bootstrap_icon "lock" %} Change Password</a>
 </p>
 {% endif %}
 
