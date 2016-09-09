@@ -173,7 +173,7 @@ def vote(request, model_id):
         return HttpResponseServerError("Invalid request. 'vote' must be 'up' or 'down'")
 
     vote.save()
-    messages.success(request, "Vote successful")
+    messages.success(request, "Vote successful.")
     return redirect('detail', model_id=model_id)
 
 

@@ -329,6 +329,15 @@ class UserTests(TestCase):
         response = self.client.get(reverse('vote', kwargs={ 'model_id': model.id })
             + '?vote=up', follow=True)
         self.assertContains(response, "You cannot vote on your own model")
+        self.assertEqual(model.score, 0)
+
+        new_user = create_user(sign_in=True, client=self.client)
+
+        response = self.client.get(reverse('vote', kwargs={ 'model_id': model.id })
+            + '?vote=up', follow=True)
+        self.assertContains(response, "Vote successful.")
+        model.refresh_from_db()
+        self.assertEqual(model.score, 1)
 
 
 class CommentTests(TestCase):
@@ -383,6 +392,19 @@ class VoteTests(TestCase):
 
         self.assertEqual(model.score, 0)
 
+    def test_change_vote(self):
+        model = create_model()
+        user = create_user(sign_in=True, client=self.client)
+
+        response = self.client.get(reverse('vote', kwargs={ 'model_id': model.id })
+            + '?vote=up', follow=True)
+        model.refresh_from_db()
+        self.assertEqual(model.score, 1)
+
+        response = self.client.get(reverse('vote', kwargs={ 'model_id': model.id })
+            + '?vote=down', follow=True)
+        model.refresh_from_db()
+        self.assertEqual(model.score, -1)
 
 class CategoryTests(TestCase):
 
