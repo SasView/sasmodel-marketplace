@@ -90,19 +90,30 @@
 <h2>Details:</h2>
 <table class="table">
     <tr>
-        <td><b>Created By</b></td>
+        <td><strong>Created By</strong></td>
         <td><a href="{% url 'profile' user_id=model.owner.id %}">{{ model.owner.username }}</a></td>
     </tr>
     <tr>
-        <td><b>Uploaded</b></td>
+        <td><strong>Uploaded</strong></td>
         <td>{{ model.upload_date }}</td>
     </tr>
     <tr>
-        <td><b>Category</b></td>
+        <td><strong>Category</strong></td>
         <td>{{ model.category|default_if_none:"None" }}</td>
     </tr>
     <tr>
-        <td><b>Verified</b></td>
+        <td><strong>Score</strong></td>
+        <td>{{ model.score }}
+        {% if request.user.is_authenticated and request.user != model.owner %}
+        <div class="pull-right">
+            <a href="{% url 'vote' model_id=model.id %}?vote=up" class="btn btn-success btn-xs">{% bootstrap_icon 'thumbs-up' %} Upvote</a>
+            <a href="{% url 'vote' model_id=model.id %}?vote=down" class="btn btn-danger btn-xs">{% bootstrap_icon 'thumbs-down' %} Downvote</a>
+        </div>
+        {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Verified</strong></td>
         <td>
             {% if model.verified %}
                 <span class="text-success">{% bootstrap_icon 'ok' %} Verified by {{ model.verified_by.first_name }} {{ model.verified_by.last_name }} on {{ model.verfied_date|date:"d M Y" }}</span>
@@ -113,7 +124,7 @@
     </tr>
 
     <tr>
-        <td><b>In Library</b></td>
+        <td><strong>In Library</strong></td>
         <td>
             {% if model.in_library %}
                 This model is included in the SasView library by default
@@ -124,7 +135,7 @@
     </tr>
 
     <tr>
-        <td><b>Files</b></td>
+        <td><strong>Files</strong></td>
         <td>
             {% if files %}
             {% for f in files %}

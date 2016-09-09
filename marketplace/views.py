@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.http import HttpResponse
+from django.http import HttpResponseServerError
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -17,6 +18,7 @@ from .models import SasviewModel
 from .models import ModelFile
 from .models import Comment
 from .models import Category
+from .models import Vote
 from .helpers import check_owned_by
 from .backends.database import DatabaseStorage
 
@@ -145,6 +147,35 @@ def edit(request, model_id):
             return redirect(model)
 
     return render(request, 'marketplace/model_edit.html', { 'form': form })
+
+@login_required
+def vote(request, model_id):
+    model = get_object_or_404(SasviewModel, pk=model_id)
+
+    if model.owner == request.user:
+        messages.error(request, "You cannot vote on your own model.",
+            extra_tags="danger")
+        return redirect('detail', model_id)
+
+    vote = Vote.objects.filter(model__id=model_id, user__id=request.user.id).first()
+    if vote is None:
+        vote = Vote(user=request.user, model=model, value=0)
+    else:
+        # User has already voted, undo their last vote
+        vote.value = -vote.value
+        vote.save()
+
+    if request.GET['vote'] == 'up':
+        vote.value = 1
+    elif request.GET['vote'] == 'down':
+        vote.value = -1
+    else:
+        return HttpResponseServerError("Invalid request. 'vote' must be 'up' or 'down'")
+
+    vote.save()
+    messages.success(request, "Vote successful")
+    return redirect('detail', model_id=model_id)
+
 
 @login_required
 def delete(request, model_id):

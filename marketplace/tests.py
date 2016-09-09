@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from marketplace.models import SasviewModel, ModelFile, Comment, Category
+from marketplace.models import SasviewModel, ModelFile, Comment, Category, Vote
 from marketplace.forms import SasviewModelForm
 
 def create_user(username=None, email=None, password="testpassword",
@@ -322,6 +322,14 @@ class UserTests(TestCase):
             follow=True)
         self.assertContains(response, "is included in")
 
+    def test_voting_permissions(self):
+        user = create_user(sign_in=True, client=self.client)
+        model = create_model(user=user)
+
+        response = self.client.get(reverse('vote', kwargs={ 'model_id': model.id })
+            + '?vote=up', follow=True)
+        self.assertContains(response, "You cannot vote on your own model")
+
 
 class CommentTests(TestCase):
 
@@ -352,6 +360,28 @@ class CommentTests(TestCase):
         model.delete()
         comments = Comment.objects.all()
         self.assertEqual(len(comments), 0)
+
+
+class VoteTests(TestCase):
+
+    def test_update_score(self):
+        model = create_model()
+        user = create_user()
+
+        vote = Vote(model=model, user=user, value=1)
+        vote.save()
+
+        self.assertEqual(model.score, 1)
+
+    def test_delete_vote(self):
+        model = create_model()
+        user = create_user()
+
+        vote = Vote(model=model, user=user, value=1)
+        vote.save()
+        vote.delete()
+
+        self.assertEqual(model.score, 0)
 
 
 class CategoryTests(TestCase):

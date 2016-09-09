@@ -7,7 +7,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from .backends.database import DatabaseStorage
 from .validators import validate_comma_separated_float_list
 from django.dispatch import receiver
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, post_save
 
 def truncate(string, length):
     if len(string) > length:
@@ -37,6 +37,7 @@ class SasviewModel(models.Model):
     example_data_y = models.CharField(validators=[validate_comma_separated_float_list],
         max_length=500, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    score = models.IntegerField(default=0)
 
     verified = models.BooleanField(default=False)
     verified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
@@ -78,6 +79,11 @@ class SasviewModel(models.Model):
         json += "]"
         return json
 
+class Vote(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    value = models.IntegerField()
+    model = models.ForeignKey(SasviewModel, on_delete=models.CASCADE)
+
 @python_2_unicode_compatible
 class ModelFile(models.Model):
     name = models.CharField(max_length=100)
@@ -102,10 +108,23 @@ class Comment(models.Model):
         return "{}: {}".format(self.user.username, content_str)
 
 @receiver(pre_delete)
-def delete_file(sender, instance, **kwargs):
+def pre_Delete_handler(sender, instance, **kwargs):
     if sender == SasviewModel:
+        # Delete all files when a model is deleted
         files = ModelFile.objects.filter(model__pk=instance.id)
         for f in files:
             f.delete()
     elif sender == ModelFile:
+        # Delete file data when a ModelFile instance is deleted
         instance.model_file.delete()
+    elif sender == Vote:
+        # Undo the vote when it's deleted
+        instance.model.score -= instance.value
+        instance.model.save()
+
+@receiver(post_save)
+def post_save_handler(sender, instance, **kwargs):
+    if sender == Vote:
+        # Update the model's score when a vote is made
+        instance.model.score += instance.value
+        instance.model.save()
