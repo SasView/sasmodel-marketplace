@@ -178,9 +178,9 @@
         <a href="{% url 'verify' model_id=model.id %}" class="btn btn-danger">{% bootstrap_icon 'remove' %} Un-Verify</a>
     {% endif %}
     {% if model.in_library == False %}
-        <a href="{% url 'toggle_in_library' model_id=model.id %}" class="btn btn-success">Add to Library</a>
+        <a href="{% url 'toggle_in_library' model_id=model.id %}" class="btn btn-success">{% bootstrap_icon 'book' %} Add to Library</a>
     {% else %}
-        <a href="{% url 'toggle_in_library' model_id=model.id %}" class="btn btn-danger">Remove from Library</a>
+        <a href="{% url 'toggle_in_library' model_id=model.id %}" class="btn btn-danger">{% bootstrap_icon 'book' %} Remove from Library</a>
     {% endif %}
 
 </div>
