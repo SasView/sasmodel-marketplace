@@ -44,7 +44,7 @@
     </p>
     {% if model.example_data_x and model.example_data_x %}
         <h2>Example Data:</h2>
-        <canvas class="center-block" id="example-graph" width="500" height="500"></canvas>
+        <canvas class="center-block" id="example-graph" width="500" height="500" style="max-width: 600px;"></canvas>
         <script type="text/javascript">
             Chart.defaults.global.legend.display = false;
             var ctx = $("#example-graph");
@@ -72,7 +72,7 @@
                             gridLines: { display: false }
                         }]
                     },
-                    responsive: false,
+                    responsive: true,
                 }
 
             });
