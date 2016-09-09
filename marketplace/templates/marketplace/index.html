@@ -19,8 +19,9 @@
 
 {% block content %}
 
+<div class="row">
 <!-- Start of explanatory text -->
-<div class="jumbotron">
+<div class="jumbotron col-md-10">
     <div class="container">
         <h2>Welcome to the SasView Marketplace!</h2>
         The Marketplace allows members of the SAS Community to contribute plug-in
@@ -56,27 +57,15 @@
     </div>
 </div>
 <!-- End of explanatory text -->
-
-<h3>Browse Models by Category:</h3>
-<ul style="font-size: 20px;">
-    {% for category in categories %}
-        <li><a href="{% url 'view_category' slug=category.slug %}">{{ category.name }}</a></li>
-    {% endfor %}
-    <li><a href="{% url 'view_category' %}">All Models</a></li>
-</ul>
-
-
-<div class="pagination-container">
-<div>
-    {% if categories.has_previous %}
-        <a href="?page={{ categories.previous_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-left' %}</a>
-    {% endif %}
-    <span>Page {{ categories.number }} of {{ categories.paginator.num_pages }}</span>
-    {% if categories.has_next %}
-        <a href="?page={{ categories.next_page_number }}" class="btn btn-default">{% bootstrap_icon 'menu-right' %}</a>
-    {% endif %}
+<div id="category-nav" class="col-md-2">
+    <h3>Categories:</h3>
+    <ul class="nav nav-pills nav-stacked">
+        {% for category in categories %}
+            <li role="presentation"><a href="{% url 'view_category' slug=category.slug %}">{{ category.name }}</a></li>
+        {% endfor %}
+        <li role="presentation"><a href="{% url 'view_category' %}">All Models</a></li>
+    </ul>
 </div>
 </div>
-
 
 {% endblock content %}

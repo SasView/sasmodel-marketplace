@@ -38,43 +38,56 @@
 
 {% if models %}
 
-<table class="table search-results">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Category</th>
-        <th>Upload Date</th>
-        <th>Author</th>
-        <th>Score</th>
-        <th>Verified</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for model in models %}
-    <tr>
-        <td class="model-name"><a href="{% url 'detail' model.id %}">{{ model.name }}</a></td>
-        <td>{{ model.description_truncated }}</td>
-        <td>{{ model.category|default_if_none:"None" }}</td>
-        <td class="model-date">{{ model.upload_date|date:"d M Y" }}</td>
-        <td><a href="{% url 'profile' user_id=model.owner.id %}">{{ model.owner.username }}</a></td>
-        <td>{{ model.score }}</td>
-        <td align="center">
-            {% if model.verified %}
-                <span class="text-success">{% bootstrap_icon 'ok' %}</span>
-            {% else %}
-                <span class="text-danger">{% bootstrap_icon 'remove' %}</span>
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-10">
+        <table class="table search-results">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Upload Date</th>
+                <th>Author</th>
+                <th>Score</th>
+                <th>Verified</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for model in models %}
+            <tr>
+                <td class="model-name"><a href="{% url 'detail' model.id %}">{{ model.name }}</a></td>
+                <td>{{ model.description_truncated }}</td>
+                <td>{{ model.category|default_if_none:"None" }}</td>
+                <td class="model-date">{{ model.upload_date|date:"d M Y" }}</td>
+                <td><a href="{% url 'profile' user_id=model.owner.id %}">{{ model.owner.username }}</a></td>
+                <td>{{ model.score }}</td>
+                <td align="center">
+                    {% if model.verified %}
+                        <span class="text-success">{% bootstrap_icon 'ok' %}</span>
+                    {% else %}
+                        <span class="text-danger">{% bootstrap_icon 'remove' %}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 {% else %}
 <p>
     No models in this category.
 </p>
 {% endif %}
+    </div>
+    <div class="col-md-2">
+        <h3>Categories:</h3>
+        <ul class="nav nav-pills nav-stacked">
+            {% for nav_cat in categories %}
+                <li role="presentation" {% if nav_cat == category %}class="active"{% endif %}><a href="{% url 'view_category' slug=nav_cat.slug %}">{{ nav_cat.name }}</a></li>
+            {% endfor %}
+            <li role="presentation" {% if not category %}class="active"{% endif %}><a href="{% url 'view_category' %}">All Models</a></li>
+        </ul>
+    </div>
+</div>
 
 <div class="pagination-container">
 <div>
