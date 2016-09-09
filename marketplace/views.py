@@ -168,6 +168,18 @@ def verify(request, model_id):
     messages.success(request, "Model has been {}".format(action))
     return redirect('detail', model_id=model.id)
 
+@login_required
+def toggle_in_library(request, model_id):
+    if not request.user.is_staff:
+        messages.error(request, "You do not have permission to edit library status",
+            extra_tags="danger")
+        return redirect('detail', model_id=model_id)
+    model = get_object_or_404(SasviewModel, pk=model_id)
+    model.in_library = not model.in_library
+    model.save()
+    messages.success(request, "Library status changed successfully")
+    return redirect('detail', model_id=model_id)
+
 
 # Model file views
 

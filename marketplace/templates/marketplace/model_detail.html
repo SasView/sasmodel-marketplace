@@ -108,6 +108,17 @@
     </tr>
 
     <tr>
+        <td><b>In Library</b></td>
+        <td>
+            {% if model.in_library %}
+                This model is included in the SasView library by default
+            {% else %}
+                This model is not currently included in the SasView library. You must download the files and install it yourself.
+            {% endif %}
+        </td>
+    </tr>
+
+    <tr>
         <td><b>Files</b></td>
         <td>
             {% if files %}
@@ -166,6 +177,12 @@
     {% else %}
         <a href="{% url 'verify' model_id=model.id %}" class="btn btn-danger">{% bootstrap_icon 'remove' %} Un-Verify</a>
     {% endif %}
+    {% if model.in_library == False %}
+        <a href="{% url 'toggle_in_library' model_id=model.id %}" class="btn btn-success">Add to Library</a>
+    {% else %}
+        <a href="{% url 'toggle_in_library' model_id=model.id %}" class="btn btn-danger">Remove from Library</a>
+    {% endif %}
+
 </div>
 {% endif %}
 

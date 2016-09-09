@@ -101,7 +101,7 @@ class SasviewModelTests(TestCase):
         model.example_data_x = form.cleaned_data['example_data'][0]
         model.example_data_y = form.cleaned_data['example_data'][1]
         model.save()
-        
+
         # Ensure file is parsed and saved correctly
         self.assertTrue(model.example_data_x.startswith("0.0005,0.0106939,0.02"))
         self.assertTrue(model.example_data_y.startswith("1.0007,0.872769,0.593"))
@@ -304,6 +304,23 @@ class UserTests(TestCase):
         response = self.client.get(reverse('verify', kwargs={'model_id':model.id}),
             follow=True)
         self.assertContains(response, "Verified by {}".format(user.first_name))
+
+    def test_toggle_library_permissions(self):
+        user = create_user(sign_in=True, client=self.client)
+        model = create_model(user=user)
+
+        # Check unauthorised user can't toggle library status
+        response = self.client.get(reverse('toggle_in_library', kwargs={ 'model_id': model.id }),
+            follow=True)
+        self.assertContains(response, "not currently included")
+
+        user.is_staff = True
+        user.save()
+
+        # Check authorised user can toggle library status
+        response = self.client.get(reverse('toggle_in_library', kwargs={ 'model_id': model.id }),
+            follow=True)
+        self.assertContains(response, "is included in")
 
 
 class CommentTests(TestCase):

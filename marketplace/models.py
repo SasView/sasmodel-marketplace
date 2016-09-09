@@ -43,6 +43,8 @@ class SasviewModel(models.Model):
         related_name='models_verified')
     verfied_date = models.DateTimeField(null=True)
 
+    in_library = models.BooleanField(default=False)
+
     def verify(self, user):
         if not user.is_staff:
             raise PermissionDenied("Only staff have permission to verify models")
