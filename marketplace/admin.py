@@ -11,7 +11,8 @@ class ModelFileAdmin(admin.ModelAdmin):
 
 @admin.register(SasviewModel)
 class SasviewModelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'description_truncated', 'category', 'upload_date')
+    list_display = ('name', 'owner', 'description_truncated', 'category',
+        'score', 'verified', 'in_library', 'upload_date')
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
