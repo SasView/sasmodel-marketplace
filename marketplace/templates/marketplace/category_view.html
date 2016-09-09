@@ -46,6 +46,7 @@
         <th>Category</th>
         <th>Upload Date</th>
         <th>Author</th>
+        <th>Score</th>
         <th>Verified</th>
     </tr>
     </thead>
@@ -57,6 +58,7 @@
         <td>{{ model.category|default_if_none:"None" }}</td>
         <td class="model-date">{{ model.upload_date|date:"d M Y" }}</td>
         <td><a href="{% url 'profile' user_id=model.owner.id %}">{{ model.owner.username }}</a></td>
+        <td>{{ model.score }}</td>
         <td align="center">
             {% if model.verified %}
                 <span class="text-success">{% bootstrap_icon 'ok' %}</span>

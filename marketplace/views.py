@@ -94,7 +94,7 @@ def view_category(request, slug=None):
         category = None
     else:
         category = get_object_or_404(Category, pk=slug)
-        models = SasviewModel.objects.filter(category__slug=category.slug).order_by("-upload_date")
+        models = SasviewModel.objects.filter(category__slug=category.slug).order_by("-score")
 
     paginator = Paginator(models, 20)
     page = request.GET.get('page')
