@@ -38,6 +38,6 @@
 {% endif %}
 
 <a href="{% url 'detail' model_id=file_object.model.id %}" class="btn btn-default">Back to Model</a>
-<a href="{% url 'download_file' filename=f.model_file.name %}" class="btn btn-primary">{% bootstrap_icon "download" %} Download</a>
+<a href="{% url 'download_file' filename=file_object.model_file.name %}" class="btn btn-primary">{% bootstrap_icon "download" %} Download</a>
 
 {% endblock content %}
