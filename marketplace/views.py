@@ -19,7 +19,7 @@ from .models import ModelFile
 from .models import Comment
 from .models import Category
 from .models import Vote
-from .helpers import check_owned_by
+from .helpers import check_owned_by_or_admin
 from .backends.database import DatabaseStorage
 
 def index(request):
@@ -129,7 +129,7 @@ def create(request):
 
 @login_required
 def edit(request, model_id):
-    model = check_owned_by(request, model_id)
+    model = check_owned_by_or_admin(request, model_id)
     if not isinstance(model, SasviewModel):
         return model
 
@@ -179,7 +179,7 @@ def vote(request, model_id):
 
 @login_required
 def delete(request, model_id):
-    model = check_owned_by(request, model_id)
+    model = check_owned_by_or_admin(request, model_id)
     if not isinstance(model, SasviewModel):
         return model
     model.delete()
@@ -250,7 +250,7 @@ def delete_file(request, file_id):
 
 @login_required
 def edit_files(request, model_id):
-    model = check_owned_by(request, model_id)
+    model = check_owned_by_or_admin(request, model_id)
     if not isinstance(model, SasviewModel):
         return model
     files = ModelFile.objects.filter(model__id=model.id)

@@ -149,7 +149,7 @@
     </tr>
 </table>
 
-{% if request.user == model.owner %}
+{% if request.user == model.owner or request.user.is_staff %}
 <div>
 <a href="{% url 'edit' model_id=model.id %}" class="btn btn-primary btn-edit">{% bootstrap_icon "pencil" %} Edit Details</a>
 <a href="{% url 'edit_files' model_id=model.id %}" class="btn btn-primary btn-edit">{% bootstrap_icon "file" %} Edit Files</a>
