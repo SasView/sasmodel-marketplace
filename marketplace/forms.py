@@ -77,7 +77,7 @@ class ExampleDataField(ModelFileField):
 
 class SasviewModelForm(ModelForm):
     category = forms.ModelChoiceField(queryset=Category.objects.all(), required=False)
-    example_data = ExampleDataField(mimetypes=['text/plain'], max_size=5*2**10,
+    example_data = ExampleDataField(mimetypes=['text/plain'], max_size=15*2**10,
         required=False, help_text=("(Optional) Run your model in SasView, right click on the "
         "theory curve and select \"Save As\". Save the data as a "
         ".txt file and upload it here. The data will display as a graph on"
@@ -93,7 +93,7 @@ class SasviewModelForm(ModelForm):
 
 class ModelFileForm(ModelForm):
     model_file = ModelFileField(allow_empty_file=False,
-        mimetypes=["text/x-c", "text/x-python"], max_size=20*2**10)
+        mimetypes=["text/x-c", "text/x-python"], max_size=50*2**10)
     class Meta:
         model = ModelFile
         fields = ("model_file",)

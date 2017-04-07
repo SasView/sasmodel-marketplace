@@ -33,9 +33,9 @@ class SasviewModel(models.Model):
     upload_date = models.DateTimeField(verbose_name='Date Published',
         auto_now_add=True)
     example_data_x = models.CharField(validators=[validate_comma_separated_float_list],
-        max_length=500, null=True,blank=True)
+        max_length=5000, null=True,blank=True)
     example_data_y = models.CharField(validators=[validate_comma_separated_float_list],
-        max_length=500, null=True,blank=True)
+        max_length=5000, null=True,blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
     verified = models.BooleanField(default=False,blank=True)
