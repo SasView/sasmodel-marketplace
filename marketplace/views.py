@@ -107,7 +107,8 @@ def view_category(request, slug=None):
         models = paginator.page(paginator.num_pages)
 
     return render(request, 'marketplace/category_view.html',
-        { 'models': models, 'category': category, 'categories': Category.objects.all() })
+        { 'models': models, 'category': category, 
+            'categories': Category.objects.all().order_by('name') })
 
 @login_required
 def create(request):
