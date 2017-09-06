@@ -23,7 +23,7 @@ from .helpers import check_owned_by_or_admin
 from .backends.database import DatabaseStorage
 
 def index(request):
-    all_categories = Category.objects.all()
+    all_categories = Category.objects.all().order_by('name')
 
     paginator = Paginator(all_categories, 15)
     page = request.GET.get('page')
