@@ -305,9 +305,9 @@ def profile(request, user_id=None):
     if user_id is None:
         user_id = request.user.id
     user = get_object_or_404(User, pk=user_id)
-    all_models = SasviewModel.objects.filter(owner__pk=user.id)
+    all_models = SasviewModel.objects.filter(owner__pk=user.id).order_by('-upload_date')
 
-    paginator = Paginator(all_models, 5)
+    paginator = Paginator(all_models, 15)
 
     page = request.GET.get('page')
     try:
