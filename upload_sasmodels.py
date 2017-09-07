@@ -30,9 +30,14 @@ def _remove_all(pattern, string):
     return string
 
 def parse_all_models():
+    models_dir = os.path.join(SASMODELS_DIR, "sasmodels", "models")
+    if not os.path.isdir(models_dir):
+        print("Models directory not found at: {}".format(models_dir))
+        return
+
     print("Uploading sasmodels from: {}".format(SASMODELS_DIR))
     # TODO: Better glob so __init__ does't need to be manually skipped
-    for file_path in glob(os.path.join(SASMODELS_DIR, "sasmodels", "models", "*.py")):
+    for file_path in glob(os.path.join(models_dir, "*.py")):
         file_name = os.path.split(file_path)[-1]
         if file_name[0] == '_':
             # Skip __init__.py and _spherepy.py
@@ -179,7 +184,7 @@ def parse_description(file_contents):
 
 def parse_category(file_contents):
     # (str) -> (Category or None)
-    # Get the model's category from the contents of it's python file
+    # Get the model's category from the contents of its python file
     category_name = ""
     category_regex= "category[\s]?=[\s]?[\"']([a-zA-Z\s:_-]*)[\"']"
     category_result = None
