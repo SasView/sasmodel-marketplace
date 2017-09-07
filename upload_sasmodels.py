@@ -13,16 +13,16 @@ from marketplace.models import SasviewModel
 from marketplace.models import Category
 from marketplace.models import ModelFile
 
+# Points to a clone of the sasmodels repo
 SASMODELS_DIR = os.environ.get("SASMODELS_DIR", "../sasmodels")
 TAG_PATTERN = re.compile("(:[a-zA-Z]+:)") # Matches ':tag:'
 REF_DEF_PATTERN = re.compile("(.. \[#[a-zA-Z]*\])") # Matches '.. [#RefTag]'
 REF_PATTERN = re.compile("(\\\ \[#[a-zA-Z]*\]_)") # Matches '\ #[RefTag]_'
 UNDERLINE_PATTERN = re.compile("(-{3,})") # Matches 3 or more consecutive '-'s
 
-file_path = os.path.join(SASMODELS_DIR, "sasmodels", "models", "star_polymer.py")
-
-
 def _remove_all(pattern, string):
+    # (SRE_Pattern, str) -> (str)
+    # Remove all text that matches a compiled regex (from re.compile) from string
     res = pattern.search(string)
     while res is not None:
         string = string.replace(res.group(0), "")
@@ -30,6 +30,7 @@ def _remove_all(pattern, string):
     return string
 
 def parse_all_models():
+    print("Uploading sasmodels from: {}".format(SASMODELS_DIR))
     # TODO: Better glob so __init__ does't need to be manually skipped
     for file_path in glob(os.path.join(SASMODELS_DIR, "sasmodels", "models", "*.py")):
         file_name = os.path.split(file_path)[-1]
@@ -43,7 +44,9 @@ def parse_all_models():
         with open(file_path, 'r') as f:
             file_contents = f.read() 
 
-        # TODO: This assumes model names never change
+        # BUG: This assumes model names never change, so if the name of a python
+        # model file is changed, a new model will be created in the marketplace
+        # instead of renaming the existing one
         model = None
         try:
             model = SasviewModel.objects.get(name=model_name, in_library=True)
@@ -55,35 +58,54 @@ def parse_all_models():
             # Create new model (verify method saves model)
             updated_model.verify(updated_model.owner)
             print("Created {}".format(model_name))
+            upload_model_files(updated_model, file_path)
         else:
-            # Check if model needs updating. Explicit check done to avoid
-            # calling save on every model - saves time
+            # Check if model needs updating
+            # BUG: If only the c file is changed, but not the python file,
+            # the updated c file won't be uploaded. Editing the python file
+            # triggers the upload of both the c & the python files.
             if not model.description == updated_model.description or \
                 not model.category == updated_model.category:
                 model.description = updated_model.description
                 model.category = updated_model.category
                 model.save()
                 print("Updated {}".format(model_name))
+                for model_file in ModelFile.objects.filter(model__pk=model.id):
+                    model_file.delete()
+                upload_model_files(model, file_path)
+    print("Upload complete")
 
 def upload_file(model, file_path):
+    # (SasviewModel, str) -> ()
+    # Upload the file at file_path to the model
     file_name = os.path.split(file_path)[-1]
-    file_name = os.path.splitext(file_name)[0]
 
     file_obj = None
     with open(file_path, 'rb') as file_handle:
         file_obj = SimpleUploadedFile(file_name, file_handle.read())
 
     if file_obj is None:
-        raise Exception("Unable to open file: {}".format(file_path))
+        raise Exception("Unable to upload file: {}".format(file_path))
     
     model_file = ModelFile(name=file_name, model=model, model_file=file_obj)
     model_file.save()
 
 def upload_model_files(model, file_path):
-    return
+    # (SasviewModel, str) -> ()
+    # Upload file_path.py and file_path.c to model if they exist
+    extensions = [".py", ".c"]
+    file_path = os.path.splitext(file_path)[0]
+    for ext in extensions:
+        if os.path.isfile(file_path + ext):
+            try:
+                upload_file(model, file_path + ext)
+            except Exception as e:
+               print(e)
 
 def parse_description(file_contents):
-    # str -> str
+    # (str) -> (str)
+    # Extract the model description from the file's docstring, and format it
+    # into something the marketplace can make sense of
     description = ""
     paragraph = ""
     is_math = False
@@ -156,7 +178,8 @@ def parse_description(file_contents):
     return description
 
 def parse_category(file_contents):
-    # str -> Category or None
+    # (str) -> (Category or None)
+    # Get the model's category from the contents of it's python file
     category_name = ""
     category_regex= "category[\s]?=[\s]?[\"']([a-zA-Z\s:_-]*)[\"']"
     category_result = None
@@ -175,7 +198,8 @@ def parse_category(file_contents):
     return category
 
 def parse_model(model_name, file_contents):
-    # str -> SasviewModel
+    # (str) -> (SasviewModel)
+    # Return a SasviewModel object given the contents of a model file
     description = parse_description(file_contents)
     category = parse_category(file_contents)
     owner = User.objects.get(username='sasview')
@@ -184,5 +208,5 @@ def parse_model(model_name, file_contents):
         category=category, in_library=True, owner=owner)
     return model
 
-# if __name__ == '__main__':
-#     parse_all_models()
+if __name__ == '__main__':
+    parse_all_models()
