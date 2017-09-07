@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.http import HttpResponse
 from django.http import HttpResponseServerError
+from django.http import Http404
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
@@ -232,16 +233,19 @@ def download_file(request, filename):
     storage = DatabaseStorage()
     try:
         model_file = storage.open(filename, 'rb')
-        file_content = model_file.read()
     except Exception as e:
-        file_content = str(e)
+        return HttpResponseServerError(str(e))
+    if model_file is None:
+        raise Http404("File not found.")
+    file_content = model_file.read()
     res = HttpResponse(file_content, content_type="application/force_download")
     return res
 
 @login_required
 def delete_file(request, file_id):
     model_file = ModelFile.objects.filter(pk=file_id).first()
-    if not model_file.model.owner == request.user:
+    model = check_owned_by_or_admin(request, model_file.model.id)
+    if model != model_file.model:
         messages.error(request, "You are not authorised to delete this file.",
             extra_tags="danger")
         return redirect('detail', model_id=model_file.model.id)

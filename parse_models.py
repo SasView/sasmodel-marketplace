@@ -8,8 +8,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sasmarket.settings")
 django.setup()
 
 from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from marketplace.models import SasviewModel
 from marketplace.models import Category
+from marketplace.models import ModelFile
 
 SASMODELS_DIR = os.environ.get("SASMODELS_DIR", "../sasmodels")
 TAG_PATTERN = re.compile("(:[a-zA-Z]+:)") # Matches ':tag:'
@@ -62,7 +64,23 @@ def parse_all_models():
                 model.category = updated_model.category
                 model.save()
                 print("Updated {}".format(model_name))
-            continue
+
+def upload_file(model, file_path):
+    file_name = os.path.split(file_path)[-1]
+    file_name = os.path.splitext(file_name)[0]
+
+    file_obj = None
+    with open(file_path, 'rb') as file_handle:
+        file_obj = SimpleUploadedFile(file_name, file_handle.read())
+
+    if file_obj is None:
+        raise Exception("Unable to open file: {}".format(file_path))
+    
+    model_file = ModelFile(name=file_name, model=model, model_file=file_obj)
+    model_file.save()
+
+def upload_model_files(model, file_path):
+    return
 
 def parse_description(file_contents):
     # str -> str
@@ -166,5 +184,5 @@ def parse_model(model_name, file_contents):
         category=category, in_library=True, owner=owner)
     return model
 
-if __name__ == '__main__':
-    parse_all_models()
+# if __name__ == '__main__':
+#     parse_all_models()
