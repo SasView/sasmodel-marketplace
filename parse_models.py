@@ -12,10 +12,20 @@ from marketplace.models import SasviewModel
 from marketplace.models import Category
 
 SASMODELS_DIR = os.environ.get("SASMODELS_DIR", "../sasmodels")
-TAG_PATTERN = re.compile("(:[a-zA-Z]+:)")
-REF_PATTERN = re.compile("(.. \[#[a-zA-Z]*\])")
+TAG_PATTERN = re.compile("(:[a-zA-Z]+:)") # Matches ':tag:'
+REF_DEF_PATTERN = re.compile("(.. \[#[a-zA-Z]*\])") # Matches '.. [#RefTag]'
+REF_PATTERN = re.compile("(\\\ \[#[a-zA-Z]*\]_)") # Matches '\ #[RefTag]_'
+UNDERLINE_PATTERN = re.compile("(-{3,})") # Matches 3 or more consecutive '-'s
 
 file_path = os.path.join(SASMODELS_DIR, "sasmodels", "models", "star_polymer.py")
+
+
+def _remove_all(pattern, string):
+    res = pattern.search(string)
+    while res is not None:
+        string = string.replace(res.group(0), "")
+        res = pattern.search(string)
+    return string
 
 def parse_all_models():
     # TODO: Better glob so __init__ does't need to be manually skipped
@@ -69,13 +79,19 @@ def parse_description(file_contents):
             break
         
         # Remove RST :tags:
-        res = TAG_PATTERN.match(line)
+        res = TAG_PATTERN.search(line)
         if res is not None:
             tag = res.group(1)
             if tag == ":nowrap:" or tag == ":figure:":
                 continue
             line = line.replace(tag, "")
-        
+
+        # Remove links to references
+        line = _remove_all(REF_PATTERN, line)
+
+        # Remove underlines
+        line = _remove_all(UNDERLINE_PATTERN, line)
+
         # Can't display images on sasmodels marketplace
         if ".. figure::" in line:
             continue
@@ -104,13 +120,13 @@ def parse_description(file_contents):
             description += paragraph + "\n\n"
             paragraph = ""
 
-        # Reference line
-        res = REF_PATTERN.match(line)
+        # Reference definition line. Each reference is on a separate line.
+        res = REF_DEF_PATTERN.search(line)
         if res is not None:
-            line = line.replace(res.group(0), "")
+            line = _remove_all(REF_DEF_PATTERN, line)
             description += line + "\n"
             continue
-        
+
         # Authorship and Verification line
         if line[:4] == "* **":
             line = line[2:] # Strip '* '
