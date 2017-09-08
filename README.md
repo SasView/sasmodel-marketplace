@@ -9,14 +9,13 @@ Deployed at http://marketplace.sasview.org
   * Secret keys and passwords are in there!  
 * Deployment is semi-automatic:
   * When changes are pushed to Github, a Travis job is kicked off to test.
-  * If the tests pass, the code is pushed to a git repo on the deployment server
-  , but this does not deploy the code
-  * On the deployment server, do the following:
+  * If the tests pass, the code is pushed to a git repo on the deployment server.
+  * If any new static files are added, run the following on the server:
     * ```cd /var/www/marketplace.sasview.org```  
-    * ```git pull```
     * ```source virtualenv/bin/activate``` which should give a prompt beginning
      with ```(virtualenv)```
     * Collect static files with ```sudo python manage.py collectstatic```
+* Any changes made won't take effect until Apache is reloaded with ```sudo service apache2 reload```
 
 ## Developer notes    
 *   Ensure you have a Postgresql server up and running  
