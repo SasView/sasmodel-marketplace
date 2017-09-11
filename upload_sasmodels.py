@@ -192,12 +192,12 @@ def parse_category(file_contents):
 
     if category_result is not None:
         category_name = category_result.group(1)
-        category_name = category_name.split(":")[-1].title()
+        category_name = category_name.split(":")[-1]
     
     category = None
     if category_name != "":
         try:
-            category = Category.objects.get(name=category_name)
+            category = Category.objects.get(slug=category_name)
         except Exception:
             category = None
     return category
