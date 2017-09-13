@@ -146,28 +146,29 @@ def parse_description(file_contents):
         if ".. math::" in line and not is_math:
             is_math = True
             line = line.replace(".. math::", "$$")
-            skip_line = (line.strip() == "$$")
-        elif is_math and line == "":
-            if skip_line: # Skip the first blank line after '.. math::'
-                skip_line = False
-                continue
-            else: # End of '.. math::' section
-                is_math = False
-                paragraph += "\n$$"
-                description += paragraph + "\n"
-                paragraph = ""
-                continue
+            # skip_line = (line.strip() == "$$")
+        elif is_math and line == "" and paragraph.strip() != "$$":
+            # if skip_line: # Skip the first blank line after '.. math::'
+                # skip_line = False
+                # continue
+            # else: # End of '.. math::' section
+            is_math = False
+            paragraph += "\n$$"
+            description += paragraph + "\n"
+            paragraph = ""
+            continue
         elif is_math:
             # MathJax doesn't handle ampersands very well
             line = line.replace("&=", "=")
             line = line.replace("=&\\", "=")
             line = line.replace("&\\", "")
+            line = line.strip()
         else:
             # Not math
             line = line.replace("\\ ", "")
         
         # End of a paragraph
-        if line == "":
+        if line == "" and not is_math:
             description += paragraph + "\n\n"
             paragraph = ""
 
@@ -220,6 +221,7 @@ def parse_model(model_name, file_contents):
     return model
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='upload.log', level=logging.INFO, 
+    logging.basicConfig(filename="upload.log", level=logging.INFO, 
         format="%(asctime)s - %(message)s", datefmt="%m/%d/%y %H:%M:%S")
+    logging.info('-' * 30) # Separate log entries
     parse_all_models()
