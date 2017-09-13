@@ -159,7 +159,12 @@ def parse_description(file_contents):
                 continue
         elif is_math:
             # MathJax doesn't handle ampersands very well
-            line = line.replace("&", "")
+            line = line.replace("&=", "=")
+            line = line.replace("=&\\", "=")
+            line = line.replace("&\\", "")
+        else:
+            # Not math
+            line = line.replace("\\ ", "")
         
         # End of a paragraph
         if line == "":
