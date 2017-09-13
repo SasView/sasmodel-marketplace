@@ -1,5 +1,6 @@
 import os
 import re
+import logging
 from glob import glob
 import django
 
@@ -32,10 +33,10 @@ def _remove_all(pattern, string):
 def parse_all_models():
     models_dir = os.path.join(SASMODELS_DIR, "sasmodels", "models")
     if not os.path.isdir(models_dir):
-        print("Models directory not found at: {}".format(models_dir))
+        logging.error("Models directory not found at: {}".format(models_dir))
         return
-
-    print("Uploading sasmodels from: {}".format(SASMODELS_DIR))
+    
+    logging.info("Uploading sasmodels from {}".format(SASMODELS_DIR))
     # TODO: Better glob so __init__ does't need to be manually skipped
     for file_path in glob(os.path.join(models_dir, "*.py")):
         file_name = os.path.split(file_path)[-1]
@@ -74,11 +75,11 @@ def parse_all_models():
                 model.description = updated_model.description
                 model.category = updated_model.category
                 model.save()
-                print("Updated {}".format(model_name))
+                logging.info("Updated {}".format(model_name))
                 for model_file in ModelFile.objects.filter(model__pk=model.id):
                     model_file.delete()
                 upload_model_files(model, file_path)
-    print("Upload complete")
+    logging.info("Upload complete")
 
 def upload_file(model, file_path):
     # (SasviewModel, str) -> ()
@@ -214,4 +215,6 @@ def parse_model(model_name, file_contents):
     return model
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='upload.log', level=logging.INFO, 
+        format="%(asctime)s - %(message)s", datefmt="%m/%d/%y %H:%M:%S")
     parse_all_models()
