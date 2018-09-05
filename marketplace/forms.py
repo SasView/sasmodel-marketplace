@@ -93,7 +93,7 @@ class SasviewModelForm(ModelForm):
 
 class ModelFileForm(ModelForm):
     model_file = ModelFileField(allow_empty_file=False,
-        mimetypes=["text/x-c", "text/x-python", "text/plain"], max_size=50*2**10)
+        mimetypes=["text/x-c", "text/x-csrc", "text/x-python", "text/plain"], max_size=50*2**10)
     class Meta:
         model = ModelFile
         fields = ("model_file",)
