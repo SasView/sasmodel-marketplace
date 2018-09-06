@@ -17,10 +17,10 @@ from django.core.wsgi import get_wsgi_application
 try:
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sasmarket.settings")
     application = get_wsgi_application()
-    print "WSGI without exception"
+    print("WSGI without exception")
 except:
-    print "Handling WSGI exception"
-    print "Pyton maxunicode: {}".format(sys.maxunicode)
+    print("Handling WSGI exception")
+    print("Pyton maxunicode: {}".format(sys.maxunicode))
     if 'mod_wsgi' in sys.modules:
         traceback.print_exc()
         os.kill(os.getpid(), signal.SIGINT)
