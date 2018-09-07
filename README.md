@@ -11,9 +11,10 @@ A script has been generated that will execute all the steps shown in the next se
 
 ```
 git clone https://github.com/SasView/sasmodel-marketplace
-cd sasmodel-marketplace/scripts
-./quick_setup.sh
+./sasmodel-marketplace/scripts/quick_setup.sh
 ```
+As part of the installation process it will ask for your password to run ```sudo``` so the user that runs the installation will need to be on the ```sudoers``` list.
+
 You should now be able to access the newly created SasView Marketplace site by navigating to 127.0.0.1 on a web browser the server itself or by navigating to the server's external IP address in a web browser on another machine.
 
 **N.B.** This setup is only recommended for testing and development as the passwords generated as the same as the usernames and therefore are highly insecure and **not** suitable for deployment.
