@@ -25,7 +25,7 @@ SECRET_KEY = '^p2hf7r33$&(uo@i#y&y8!l4k8-jl2e6amva6)3!!q#ts_41o)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -79,9 +79,9 @@ WSGI_APPLICATION = 'sasmarket.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'marketplace',
-        'USER': 'postgres',
-        'PASSWORD': '',
+        'NAME': 'sasmodeldatabase',
+        'USER': 'sasmodeluser',
+        'PASSWORD': 'sasmodeluser',
         'HOST': '127.0.0.1',
         'PORT': '5432'
     }

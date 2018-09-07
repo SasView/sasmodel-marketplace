@@ -5,7 +5,22 @@ A marketplace website for sharing custom model files for [SasView](https://githu
 
 Deployed at http://marketplace.sasview.org
 
-## Setup instructions (Ubuntu)
+## Quick setup instructions (Ubuntu)
+
+A script has been generated that will execute all the steps shown in the next section to provide an automated way of going from a fresh Ubuntu install to having a running marketplace, to run this you will need to type the following into an Ubuntu console
+
+```
+git clone https://github.com/SasView/sasmodel-marketplace
+cd sasmodel-marketplace/scripts
+chmod 755 quick_setup.sh
+./quick_setup.sh
+```
+You should now be able to access the newly created SasView Marketplace site by navigating to 127.0.0.1 on a web browser the server itself or by navigating to the server's external IP address in a web browser on another machine.
+
+**N.B.** This setup is only recommended for testing and development as the passwords generated as the same as the usernames and therefore are highly insecure and **not** suitable for deployment.
+
+
+## Full setup instructions (Ubuntu)
 These instructions will create an installation of the SasView marketplace using the system Python installation on Ubuntu. This setup is suitable for environments where there is only one web service present on the server or virtual machine. Should the intention be to serve multiple sites from one machine the use of virtual Python environments is **strongly** recommended. More information about setting up and using a virtual environment can be [found on these pages](http://www.google.com). These instructions should be usable for other Linux flavours, however, modifications may be required to the steps delineated below.  
 
 * First download and install Ubuntu server edition, which is currently [Ubuntu 18.04.1 LTS](https://www.ubuntu.com/download/server/thank-you?version=18.04.1&architecture=amd64)  
@@ -25,7 +40,7 @@ These instructions will create an installation of the SasView marketplace using 
 * With Python setup it is then necessary to use ```easy_install``` to install ```pip``` via
 
   ```
-  sudo python /usr/lib/python3/dist-packages/easy_install.py install pip
+  sudo python /usr/lib/python3/dist-packages/easy_install.py pip
   ```
 
 * With all the required operating system packages installed it is then necessary to clone the git repository into the appropriate location for the Apache web server by entering
@@ -89,7 +104,7 @@ These instructions will create an installation of the SasView marketplace using 
 * Now that the site is configured, we must configure Apache accordingly, first copy the example Apache configuration file into the ```sites-enabled``` folder
 
   ``` 
-  sudo cp /var/www/sasmarket/marketplace.sasview.org.conf.template /etc/apache2/sites-enabled/marketplace.sasview.org.conf.example
+  sudo cp /var/www/sasmarket/marketplace.sasview.org.conf.example /etc/apache2/sites-enabled/marketplace.sasview.org.conf
   ```
 
 * Subsequently the ```wsgi``` modification must be made available to Apache for which a script exists inside the marketplace repository, it can be run by executing
