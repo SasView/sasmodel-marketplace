@@ -12,7 +12,6 @@ A script has been generated that will execute all the steps shown in the next se
 ```
 git clone https://github.com/SasView/sasmodel-marketplace
 cd sasmodel-marketplace/scripts
-chmod 755 quick_setup.sh
 ./quick_setup.sh
 ```
 You should now be able to access the newly created SasView Marketplace site by navigating to 127.0.0.1 on a web browser the server itself or by navigating to the server's external IP address in a web browser on another machine.
@@ -21,7 +20,7 @@ You should now be able to access the newly created SasView Marketplace site by n
 
 
 ## Full setup instructions (Ubuntu)
-These instructions will create an installation of the SasView marketplace using the system Python installation on Ubuntu. This setup is suitable for environments where there is only one web service present on the server or virtual machine. Should the intention be to serve multiple sites from one machine the use of virtual Python environments is **strongly** recommended. More information about setting up and using a virtual environment can be [found on these pages](http://www.google.com). These instructions should be usable for other Linux flavours, however, modifications may be required to the steps delineated below.  
+These instructions will create an installation of the SasView marketplace using the system Python installation on Ubuntu. This setup is suitable for environments where there is only one web service present on the server or virtual machine. Should the intention be to serve multiple sites from one machine the use of virtual Python environments is **strongly** recommended. More information about setting up and using a virtual environment can be [found on these pages](https://virtualenv.pypa.io/en/stable/). These instructions should be usable for other Linux flavours, however, modifications may be required to the steps delineated below.  
 
 * First download and install Ubuntu server edition, which is currently [Ubuntu 18.04.1 LTS](https://www.ubuntu.com/download/server/thank-you?version=18.04.1&architecture=amd64)  
 
