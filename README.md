@@ -17,7 +17,7 @@ As part of the installation process it will ask for your password to run ```sudo
 
 You should now be able to access the newly created SasView Marketplace site by navigating to 127.0.0.1 on a web browser the server itself or by navigating to the server's external IP address in a web browser on another machine.
 
-**N.B.** This setup is only recommended for testing and development as the passwords generated as the same as the usernames and therefore are highly insecure and **not** suitable for deployment.
+**N.B.** This setup is only recommended for testing and development as the passwords generated are the same as the usernames and therefore are highly insecure and **not** suitable for deployment.
 
 
 ## Full setup instructions (Ubuntu)
