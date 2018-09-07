@@ -1,0 +1,23 @@
+<VirtualHost *:80>
+ServerName marketplace.sasview.org
+
+Alias /static/ /var/www/marketplace.sasview.org/sasmarket/static/
+
+<Directory /var/www/marketplace.sasview.org/sasmarket/static>
+Require all granted
+</Directory>
+
+WSGIScriptAlias / /var/www/marketplace.sasview.org/sasmarket/wsgi.py
+WSGIDaemonProcess marketplace.sasview.org python-path=/var/www/marketplace.sasview.org
+WSGIProcessGroup marketplace.sasview.org
+
+<Directory /var/www/marketplace.sasview.org/sasmarket>
+<Files wsgi.py>
+Require all granted
+</Files>
+</Directory>
+
+ErrorLog /var/log/apache2/marketplace.error.log
+CustomLog /var/log/apache2/marketplace.access.log combined
+
+</VirtualHost>
