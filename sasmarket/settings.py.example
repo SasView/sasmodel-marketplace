@@ -81,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'sasmodeldatabase',
         'USER': 'sasmodeluser',
-        'PASSWORD': 'sasmodeluser',
+        'PASSWORD': '',
         'HOST': '127.0.0.1',
         'PORT': '5432'
     }
