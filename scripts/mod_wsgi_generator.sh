@@ -2,4 +2,4 @@
 
 WSGIPATH="$(sudo find /usr/local/lib -name 'mod_wsgi*gnu.so')"
 
-echo 'LoadModule mod_wsgi "'$WSGIPATH'"' | sudo tee /etc/apache2/mods-enabled/mod_wsgi.load
+echo 'LoadModule wsgi_mod "'$WSGIPATH'"' | sudo tee /etc/apache2/mods-enabled/mod_wsgi.load
