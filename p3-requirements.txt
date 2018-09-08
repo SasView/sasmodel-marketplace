@@ -3,3 +3,4 @@ django-bootstrap3
 psycopg2
 python-magic
 future
+mod_wsgi

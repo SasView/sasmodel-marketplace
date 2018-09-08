@@ -37,5 +37,8 @@ sudo python "$TARGETDIRECTORYPATH/manage.py" migrate
 sudo cp "$TARGETDIRECTORYPATH/sasmarket/marketplace.sasview.org.conf.example" "/etc/apache2/sites-enabled/marketplace.sasview.org.conf"
 "$TARGETDIRECTORYPATH/scripts/mod_wsgi_generator.sh"
 
+git clone https://github.com/SasView/sasmodels
+python upload_sasmodels.py
+
 # Restart the Apache web service
 sudo service apache2 restart
