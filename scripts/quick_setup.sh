@@ -30,7 +30,7 @@ echo "postgres:postgres" | sudo chpasswd
 sudo su - postgres -c "$TARGETDIRECTORYPATH/scripts/postgres_setup.sh"
 
 # Initialise the marketplace
-sudo cp "$TARGETDIRECTORYPATH/sasmarket/settings.py.example" "$TARGETDIRECTORYPATH/sasmarket/settings.py"
+sudo cp "$TARGETDIRECTORYPATH/sasmarket/settings.py.quicksetup.example" "$TARGETDIRECTORYPATH/sasmarket/settings.py"
 sudo python "$TARGETDIRECTORYPATH/manage.py" migrate
 
 # Prepare Apache

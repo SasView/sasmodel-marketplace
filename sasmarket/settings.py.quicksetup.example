@@ -79,9 +79,9 @@ WSGI_APPLICATION = 'sasmarket.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'marketplace',
-        'USER': 'postgres',
-        'PASSWORD': '',
+        'NAME': 'sasmodeldatabase',
+        'USER': 'sasmodeluser',
+        'PASSWORD': 'sasmodeluser',
         'HOST': '127.0.0.1',
         'PORT': '5432'
     }
