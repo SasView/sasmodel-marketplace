@@ -12,8 +12,8 @@ before_script:
 - createuser sasmodeluser
 - dropdb test_marketplace --if-exists
 - dropdb marketplace --if-exists
-- dropdb test_sasmodeldatabase
-- dropdb sasmodeldatabase
+- dropdb test_sasmodeldatabase --if-exists
+- dropdb sasmodeldatabase --if-exists
 - createdb test_marketplace
 - createdb marketplace
 - createdb test_sasmodeldatabase
