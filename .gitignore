@@ -4,5 +4,6 @@
 !.travis/travis_rsa.enc
 sasmarket/settings.py
 sasmarket/static
+sasmodels
 attachments
 virtualenv

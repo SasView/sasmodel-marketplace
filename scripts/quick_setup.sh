@@ -38,7 +38,7 @@ sudo cp "$TARGETDIRECTORYPATH/sasmarket/marketplace.sasview.org.conf.example" "/
 mod_wsgi-express module-config | sudo tee /etc/apache2/mods-enabled/wsgi_mod.load
 
 git clone https://github.com/SasView/sasmodels
-python upload_sasmodels.py
+sudo ".$TARGETDIRECTORYPATH/scripts/update_sasmodels.sh"
 
 # Restart the Apache web service
 sudo rm /etc/apache2/sites-enabled/000-default.conf
