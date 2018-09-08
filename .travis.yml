@@ -14,10 +14,10 @@ before_script:
 - dropdb marketplace --if-exists
 - dropdb test_sasmodeldatabase --if-exists
 - dropdb sasmodeldatabase --if-exists
-- createdb -O sasmodeluser test_marketplace
-- createdb -O sasmodeluser marketplace
-- createdb -O sasmodeluser test_sasmodeldatabase
-- createdb -O sasmodeluser sasmodeldatabase
+- createdb test_marketplace
+- createdb marketplace
+- createdb test_sasmodeldatabase
+- createdb sasmodeldatabase
 - python manage.py migrate
 install: pip install -r requirements.txt
 script: python manage.py test marketplace
