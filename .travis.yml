@@ -9,8 +9,10 @@ before_install:
 before_script:
 - echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 - cp sasmarket/settings.py.example sasmarket/settings.py
-- dropdb marketplace --if-exists
-- createdb marketplace
+- dropdb sasmodeldatabase --if-exists
+- dropuser sasmodeluser --if-exists
+- createuser sasmodeluser
+- createdb -O sasmodeluser sasmodeldatabase
 - python manage.py migrate
 install: pip install -r requirements.txt
 script: python manage.py test marketplace
