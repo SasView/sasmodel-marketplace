@@ -8,6 +8,6 @@ BASE_WEB_DIR="/var/www/marketplace.sasview.org"
 cd "$BASE_WEB_DIR/sasmodels"
 git pull
 
-cd $"$BASE_WEB_DIR/virtualenv"
+cd "$BASE_WEB_DIR/virtualenv"
 source bin/activate
 python ../upload_sasmodels.py
