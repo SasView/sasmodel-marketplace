@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 # Create table for storing uploaded files
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 import marketplace.backends.database
 
