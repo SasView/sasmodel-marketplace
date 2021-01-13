@@ -17,9 +17,10 @@ sudo apt install -y apache2-dev
 sudo apt install -y postgresql
 sudo apt install -y python3-dev
 sudo apt install -y python3-setuptools
+sudo apt install -y libpq-dev
 
 # Setup Python and get pip installed
-sudo ln -s /usr/bin/python3 /usr/bin/python 
+sudo ln -s /usr/bin/python3 /usr/bin/python
 sudo python /usr/lib/python3/dist-packages/easy_install.py pip
 
 # Clone the git repo and install the required Python packages for the marketplace
