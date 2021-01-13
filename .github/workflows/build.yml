@@ -10,10 +10,11 @@ jobs:
     - uses: harmon758/postgresql-action@v1
       with:
         postgresql version: '11'
-    - run: echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config \
+    - run: mkdir ~/.ssh
+           echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config \
            cp sasmarket/settings.py.example sasmarket/settings.py \
            createdb marketplace \
-           python manage.py migrate 
+           python manage.py migrate
 #  deploy:
 #    name: deploy
 #    needs: build
