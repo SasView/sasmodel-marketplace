@@ -1,5 +1,6 @@
-Django==1.10
-django-bootstrap3==7.0.1
-psycopg2==2.7
-python-magic==0.4.12
-future==0.15.2
+Django<2.1
+django-bootstrap3
+psycopg2
+python-magic
+future
+mod_wsgi
