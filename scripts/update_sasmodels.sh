@@ -9,4 +9,4 @@ cd "$BASE_WEB_DIR/sasmodels"
 git pull
 
 cd "$BASE_WEB_DIR"
-upload_sasmodels.py
+python upload_sasmodels.py
