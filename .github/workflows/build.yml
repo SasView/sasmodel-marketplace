@@ -9,6 +9,8 @@ jobs:
     - uses: actions/checkout@v2
     - run: |
         sudo apt-get -y install postgresql
+        echo "postgres:postgres" | sudo chpasswd
+        sudo su - postgres -c "$TARGETDIRECTORYPATH/scripts/postgres_setup.sh"
         mkdir ~/.ssh
         echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
         cp sasmarket/settings.py.example sasmarket/settings.py
