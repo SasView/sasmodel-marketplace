@@ -10,7 +10,7 @@ jobs:
       with:
         postgresql version: '11'
     - run: openssl aes-256-cbc -K $encrypted_1645300b04d0_key -iv $encrypted_1645300b04d0_iv -in .travis/travis_rsa.enc -out .travis/travis_rsa -d
-  deploy:
-    name: deploy
-    needs: build
-    runs-on: ubuntu-20.04
+#  deploy:
+#    name: deploy
+#    needs: build
+#    runs-on: ubuntu-20.04
