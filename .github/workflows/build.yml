@@ -6,6 +6,7 @@ jobs:
     name: build
     runs-on: ubuntu-20.04
     steps:
+    - uses: actions/checkout@v2
     - uses: harmon758/postgresql-action@v1
       with:
         postgresql version: '11'
