@@ -1,13 +1,7 @@
 # DatabaseStorage for django.
 # 2009 (c) GameKeeper Gambling Ltd, Ivanov E.
-try:
-    import StringIO # Python 2
-except:
-    from io import StringIO # Python 3
-try:
-    import urlparse # Python 2
-except:
-    from urllib import parse as urlparse # Python 3
+from io import StringIO # Python 3
+from urllib import parse as urlparse # Python 3
 import time
 import os
 from django.utils.deconstruct import deconstructible
