@@ -26,5 +26,5 @@ urlpatterns = [
     url(r'^accounts/profile/$', views.profile, name='profile'),
     url(r'^accounts/user/(?P<user_id>[0-9]+)/$', views.profile, name='profile'),
     url(r'^accounts/password_change/done', views.password_change_done, name="password_change_done"),
-    url(r'^accounts/password_change', auth_views.password_change, name="password_change"),
+    url(r'^accounts/password_change', auth_views.PasswordChangeView, name="password_change"),
 ]
