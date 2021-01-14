@@ -10,7 +10,6 @@ jobs:
         image: postgres
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: 
           POSTGRES_DB: marketplace
         ports:
           - 5432:5432
