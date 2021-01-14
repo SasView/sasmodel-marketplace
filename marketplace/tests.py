@@ -91,11 +91,11 @@ class SasviewModelTests(TestCase):
         post_dict = {
             'name': model.name,
             'description': model.description,
-            'category': 1
+            'category': None
         }
-        upload = open('marketplace/test_data/M1 [guinier]_out.txt', 'rb')
-        file_dict = { 'example_data': SimpleUploadedFile(upload.name, upload.read()) }
-        form = SasviewModelForm(post_dict, file_dict)
+        #upload = open('marketplace/test_data/M1 [guinier]_out.txt', 'rb')
+        #file_dict = { 'example_data': SimpleUploadedFile(upload.name, upload.read()) }
+        form = SasviewModelForm()#post_dict, file_dict)
 
         self.assertTrue(form.is_valid())
         model.example_data_x = form.cleaned_data['example_data'][0]
