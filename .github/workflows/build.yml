@@ -9,8 +9,6 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: marketplace
         ports:
           - 5432:5432
@@ -28,9 +26,6 @@ jobs:
         pip install -r requirements.txt
     - name: migrate
       env:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_DB: marketplace
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
       run: |
         mkdir ~/.ssh
