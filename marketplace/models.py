@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
 from .backends.database import DatabaseStorage
 from .validators import validate_comma_separated_float_list
 from django.dispatch import receiver
@@ -14,7 +13,6 @@ def truncate(string, length):
         string = string[:length-3] + "..."
     return string
 
-@python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(unique=True, primary_key=True)
@@ -25,7 +23,6 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = "Categories"
 
-@python_2_unicode_compatible
 class SasviewModel(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField()
@@ -83,7 +80,6 @@ class Vote(models.Model):
     value = models.IntegerField()
     model = models.ForeignKey(SasviewModel, on_delete=models.CASCADE)
 
-@python_2_unicode_compatible
 class ModelFile(models.Model):
     name = models.CharField(max_length=100)
     model_file = models.FileField(upload_to='uploaded_models',
