@@ -10,6 +10,7 @@ jobs:
         image: postgres
         env:
           POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ''
           POSTGRES_DB: marketplace
         ports:
           - 5432:5432
@@ -25,7 +26,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: migrate
+    - name: Migration
       env:
         POSTGRES_HOST: 127.0.0.1
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
