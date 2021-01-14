@@ -13,7 +13,7 @@ jobs:
           POSTGRES_PASSWORD: ''
           POSTGRES_DB: marketplace
         ports:
-          - 5432:5432
+          - 5432:tcp
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -28,7 +28,7 @@ jobs:
         pip install -r requirements.txt
     - name: Migration
       env:
-        POSTGRES_HOST: postgres
+        POSTGRES_HOST: 127.0.0.1
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
       run: |
         mkdir ~/.ssh
