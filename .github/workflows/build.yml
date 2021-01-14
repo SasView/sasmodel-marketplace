@@ -5,12 +5,11 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-20.04
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
     steps:
+    - name: Set Up PostgresSQL
+      run: |
+        sudo apt-get install posregresql libpq-dev
+        sudo service postgresql start
     - uses: actions/checkout@v2
     - run: |
         mkdir ~/.ssh
