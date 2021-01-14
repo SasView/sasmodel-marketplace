@@ -10,6 +10,7 @@ jobs:
     - run: |
         sudo apt-get -y install postgresql
         echo "postgres:postgres" | sudo chpasswd
+        ls
         sudo su - postgres -c "./sasmodel-marketplace/scripts/postgres_setup.sh"
         mkdir ~/.ssh
         echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
