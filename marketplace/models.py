@@ -26,7 +26,7 @@ class Category(models.Model):
 class SasviewModel(models.Model):
     name = models.CharField(max_length=150)
     description = models.TextField()
-    category = models.TextField(Category, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     upload_date = models.DateTimeField(verbose_name='Date Published',
         auto_now_add=True)
     example_data_x = models.CharField(validators=[validate_comma_separated_float_list],
