@@ -91,7 +91,7 @@ class SasviewModelTests(TestCase):
         post_dict = {
             'name': model.name,
             'description': model.description,
-            'category': None
+            'category': 'test'
         }
         upload = open('marketplace/test_data/M1 [guinier]_out.txt', 'rb')
         file_dict = { 'example_data': SimpleUploadedFile(upload.name, upload.read()) }
