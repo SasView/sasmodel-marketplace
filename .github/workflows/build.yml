@@ -13,6 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: |
+        mkdir ~/.ssh
         echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
         cp sasmarket/settings.py.example sasmarket/settings.py
         createdb marketplace
