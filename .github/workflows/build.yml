@@ -5,17 +5,19 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-20.04
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: marketplace
     steps:
-    - name: Set Up PostgresSQL
-      run: |
-        sudo apt-get install postgresql libpq-dev
-        sudo service postgresql start
     - uses: actions/checkout@v2
     - run: |
         mkdir ~/.ssh
         echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
         cp sasmarket/settings.py.example sasmarket/settings.py
-        createdb marketplace
         python manage.py migrate
 #  deploy:
 #    name: deploy
