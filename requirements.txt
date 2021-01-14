@@ -1,5 +1,5 @@
 Django<2.1
-django-bootstrap3=12.1
+django-bootstrap3==12.1
 psycopg2==2.7
 python-magic==0.4.18
 mod_wsgi
