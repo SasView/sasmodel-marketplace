@@ -2,18 +2,18 @@ name: Build and Depoly
 on: [push, pull_request]
 
 jobs:
-  build:
+  vm-job:
     name: build
     runs-on: ubuntu-20.04
     services:
       postgres:
-        image: postgres
+        image: postgres:10.8
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ''
           POSTGRES_DB: marketplace
         ports:
-          - 5432:tcp
+          - 5432:5432
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
