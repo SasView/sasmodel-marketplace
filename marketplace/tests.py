@@ -97,7 +97,7 @@ class SasviewModelTests(TestCase):
         file_dict = { 'example_data': SimpleUploadedFile(upload.name, upload.read()) }
         form = SasviewModelForm(post_dict, file_dict)
 
-        #self.assertTrue(form.is_valid())
+        self.assertTrue(form.is_valid())
         model.example_data_x = form.cleaned_data['example_data'][0]
         model.example_data_y = form.cleaned_data['example_data'][1]
         model.save()
