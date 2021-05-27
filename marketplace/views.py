@@ -9,7 +9,6 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.contrib.postgres.search import SearchVector
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import SignupForm
 from .forms import SasviewModelForm
@@ -42,8 +41,7 @@ def search(request):
     query = None
     if request.method == 'GET' and ('query' in request.GET):
         query = request.GET['query']
-        result_list = SasviewModel.objects.annotate(
-            search=SearchVector('name', 'description')).filter(search=query)
+        result_list = SasviewModel.objects.value_list('name', 'description').filter(search=query)
         verified_str = ""
         if 'verified' in request.GET:
             try:
