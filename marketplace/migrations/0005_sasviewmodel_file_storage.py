@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL([("CREATE TABLE marketplace_uploaded_files "
             "(file_name VARCHAR(100) NOT NULL PRIMARY KEY, "
-            "blob BLOB NOT NULL, "
-            "size bigint NOT NULL);")],
+            "blob_name BLOB NOT NULL, "
+            "size BIGINT NOT NULL);")],
             ["DROP TABLE \"marketplace_uploaded_files\""])
     ]
