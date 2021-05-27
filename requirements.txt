@@ -3,3 +3,5 @@ django-bootstrap3==14.2
 psycopg2==2.8.6
 python-magic==0.4.18
 mod_wsgi==4.7.1
+django-mysql
+mysqlclient

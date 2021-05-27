@@ -5,21 +5,18 @@ jobs:
   vm-job:
     name: build
     runs-on: ubuntu-20.04
-    services:
-      postgres:
-        image: postgres:10.8
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ''
-          POSTGRES_DB: marketplace
-        ports:
-          - 5432:5432
     steps:
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql version: '8.0'
+          mysql database: 'some_test'
+          mysql user: 'developer'
+          mysql password: ''
     - uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.7'
+        python-version: '3.8'
     - name: psycopg2 prerequisites
       run: sudo apt-get install python-dev libpq-dev apache2 apache2-dev
     - name: Install dependencies
@@ -28,8 +25,8 @@ jobs:
         pip install -r requirements.txt
     - name: Migration
       env:
-        POSTGRES_HOST: 127.0.0.1
-        POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+        MYSQL_HOST: 127.0.0.1
+        MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
       run: |
         mkdir ~/.ssh
         echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config

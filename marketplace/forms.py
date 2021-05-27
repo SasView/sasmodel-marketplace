@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import UploadedFile
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.template.defaultfilters import filesizeformat
@@ -8,7 +9,6 @@ from .models import SasviewModel
 from .models import ModelFile
 from .models import Comment
 from .models import Category
-import magic
 
 class ModelFileField(forms.FileField):
     def __init__(self, *args, **kwargs):
@@ -20,8 +20,13 @@ class ModelFileField(forms.FileField):
         data = super(ModelFileField, self).clean(*args, **kwargs)
         if data is None:
             return data
-        content_type = magic.from_buffer(data.read(), mime=True)
+        file = UploadedFile(data.read())
+        try:
+            content_type = file.content_type
+        except Exception:
+            content_type = file.content_type_extra
         data.seek(0)
+
         if self.mimetypes is not None and content_type not in self.mimetypes:
             raise ValidationError(
                 ("Files of type %(content_type)s cannot be uploaded. Please select a file of type %(accepted_types)s."),

@@ -66,7 +66,7 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
-    apt-get install -y python-pip git python-dev postgresql postgresql-server-dev-9.3
+    apt-get install -y python-pip git python-dev mysql mysql-server
     pip install -r /vagrant/requirements.txt
   SHELL
 end

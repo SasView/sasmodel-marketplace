@@ -10,9 +10,9 @@ class Migration(migrations.Migration):
         ('marketplace', '0004_sasviewmodel_model_file'),
     ]
     operations = [
-        migrations.RunSQL([("CREATE TABLE \"marketplace_uploaded_files\" "
-            "(\"file_name\" varchar(100) NOT NULL PRIMARY KEY, "
-            "\"blob\" bytea NOT NULL, "
-            "\"size\" bigint NOT NULL);")],
+        migrations.RunSQL([("CREATE TABLE marketplace_uploaded_files "
+            "(file_name VARCHAR(100) NOT NULL PRIMARY KEY, "
+            "blob BLOB NOT NULL, "
+            "size bigint NOT NULL);")],
             ["DROP TABLE \"marketplace_uploaded_files\""])
     ]
