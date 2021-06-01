@@ -81,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'marketplace',
         'USER': 'mysql',
-        'PASSWORD': '',
+        'PASSWORD': 'test',
         'HOST': '127.0.0.1',
         'PORT': '3306'
     }
