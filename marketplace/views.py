@@ -41,7 +41,7 @@ def search(request):
     query = None
     if request.method == 'GET' and ('query' in request.GET):
         query = request.GET['query']
-        result_list = SasviewModel.objects.value_list('name', 'description').filter(search=query)
+        result_list = SasviewModel.objects.filter(name__contains=query, description__contains=query)
         verified_str = ""
         if 'verified' in request.GET:
             try:
