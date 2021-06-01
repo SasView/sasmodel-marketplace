@@ -6,33 +6,34 @@ jobs:
     name: build
     runs-on: ubuntu-20.04
     steps:
-      - uses: mirromutth/mysql-action@v1.1
+      - name: Set up MySQL
+        uses: mirromutth/mysql-action@v1.1
         with:
           mysql version: '8.0'
           mysql database: 'some_test'
           mysql user: 'developer'
           mysql password: ''
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-    - name: psycopg2 prerequisites
-      run: sudo apt-get install python-dev libpq-dev apache2 apache2-dev
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Migration
-      env:
-        MYSQL_HOST: 127.0.0.1
-        MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
-      run: |
-        mkdir ~/.ssh
-        echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-        cp sasmarket/settings.py.example sasmarket/settings.py
-        python manage.py migrate
-        python manage.py test marketplace
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: psycopg2 prerequisites
+        run: sudo apt-get install python-dev libpq-dev apache2 apache2-dev
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Migration
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
+        run: |
+          mkdir ~/.ssh
+          echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          cp sasmarket/settings.py.example sasmarket/settings.py
+          python manage.py migrate
+          python manage.py test marketplace
 #  deploy:
 #    name: deploy
 #    needs: build
