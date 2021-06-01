@@ -10,6 +10,7 @@ from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 from .forms import SignupForm
 from .forms import SasviewModelForm
 from .forms import ModelFileForm
@@ -41,7 +42,7 @@ def search(request):
     query = None
     if request.method == 'GET' and ('query' in request.GET):
         query = request.GET['query']
-        result_list = SasviewModel.objects.filter(name__contains=query, description__contains=query)
+        result_list = SasviewModel.objects.filter(Q(name__icontains=query) | Q(description__icontains=query) | Q(category__name__icontains=query))
         verified_str = ""
         if 'verified' in request.GET:
             try:
