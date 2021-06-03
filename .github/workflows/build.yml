@@ -6,6 +6,8 @@ jobs:
     name: build
     runs-on: ubuntu-20.04
     steps:
+      - name: Shutdown Native Ubuntu MySQL
+        run: sudo service mysql stop
       - name: Set up MySQL
         uses: mirromutth/mysql-action@v1.1
         with:
