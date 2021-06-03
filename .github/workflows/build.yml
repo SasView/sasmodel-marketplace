@@ -34,7 +34,7 @@ jobs:
           mkdir ~/.ssh
           echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
           cp sasmarket/settings.py.example sasmarket/settings.py
-          python manage.py migrate
+          python manage.py migrate --database marketplace
           python manage.py test marketplace
 #  deploy:
 #    name: deploy
