@@ -12,7 +12,7 @@ jobs:
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql version: '8.0'
-          mysql database: 'marketplace'
+          mysql database: 'test_marketplace'
           mysql user: 'mysql'
           mysql password: 'test'
       - uses: actions/checkout@v2
@@ -29,13 +29,13 @@ jobs:
       - name: Migration
         env:
           MYSQL_HOST: 127.0.0.1
-          MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
+          MYSQL_PORT: 3306
         run: |
           mkdir ~/.ssh
-          echo -e "Host danse.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+          echo -e "Host danse2.chem.utk.edu\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
           cp sasmarket/settings.py.example sasmarket/settings.py
-          python manage.py migrate --database marketplace
-          python manage.py test marketplace
+          python manage.py migrate --database test_marketplace
+          python manage.py test test_marketplace
 #  deploy:
 #    name: deploy
 #    needs: build
