@@ -15,11 +15,17 @@ jobs:
           - db: mysql
             db_user: root
             db_password: root
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: mysql
+        ports:
+          - '3306:3306'
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - uses: actions/checkout@v2
-      - name: Start MySQL
-        if: matrix.db == 'mysql'
-        run: sudo systemctl start mysql.service
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
