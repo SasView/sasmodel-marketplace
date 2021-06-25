@@ -42,7 +42,7 @@ jobs:
           # They are throwaways for testing transient github instances
           DB: ${{ matrix.db }}
           DB_HOST: 127.0.0.1
-          DB_PORT: 3306
+          DB_PORT: ${{ job.services.mysql.ports['3306'] }}
           DB_USER: ${{ matrix.db_user }}
           DB_PASSWORD: ${{ matrix.db_password }}
         run: |
