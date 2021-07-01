@@ -52,9 +52,9 @@ def search(request):
             except:
                 pass
     else:
-        result_list = []
+        result_list = SasviewModel.objects.none()
 
-    paginator = Paginator(result_list, 15)
+    paginator = Paginator(result_list.order_by('name'), 15)
     page = request.GET.get('page')
     try:
         results = paginator.page(page)
