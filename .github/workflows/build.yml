@@ -20,7 +20,9 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: mysql
+          MYSQL_DATABASE: ${{ matrix.db }}
+          MYSQL_USER: ${{ matrix.db_user }}
+          MYSQL_PASSWORD: ${{ matrix.db_password }}
         ports:
           - '3306:3306'
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -36,6 +38,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Varify MySQL connection
+        env:
+          PORT: ${{ job.services.mysql.ports[3306] }}
+        run: mysqladmin ping -h "127.0.0.1" -P "$PORT"
       - name: Migration and Tests
         env:
           # These DBs and passwords are *not* production passwords.
