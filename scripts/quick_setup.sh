@@ -14,7 +14,7 @@ cd "$TARGETDIRECTORYPATH"
 # Install all the relevant software via apt
 sudo apt install -y apache2
 sudo apt install -y apache2-dev
-sudo apt install -y postgresql
+sudo apt install -y mysql
 sudo apt install -y python3-dev
 sudo apt install -y python3-setuptools
 sudo apt install -y libpq-dev
@@ -26,9 +26,9 @@ sudo python /usr/lib/python3/dist-packages/easy_install.py pip
 # Clone the git repo and install the required Python packages for the marketplace
 sudo -H pip install -r "$TARGETDIRECTORYPATH/requirements.txt"
 
-# Set up Postgres
-echo "postgres:postgres" | sudo chpasswd
-sudo su - postgres -c "$TARGETDIRECTORYPATH/scripts/postgres_setup.sh"
+# Set up MySQL
+echo "mysql:mysql" | sudo chpasswd
+sudo su - mysql -c "$TARGETDIRECTORYPATH/scripts/mysql_setup.sh"
 
 # Initialise the marketplace
 sudo cp "$TARGETDIRECTORYPATH/sasmarket/settings.py.quicksetup.example" "$TARGETDIRECTORYPATH/sasmarket/settings.py"
