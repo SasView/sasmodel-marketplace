@@ -13,8 +13,8 @@ jobs:
         python-version: [ 3.8 ]
         include:
           - db: mysql
-            db_user: root
-            db_password: root
+            db_user: mysql
+            db_password: test
     services:
       mysql:
         image: mysql:8.0
