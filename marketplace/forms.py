@@ -48,7 +48,7 @@ class ExampleDataField(ModelFileField):
         error = None
         for line in data:
             values = line.split()
-            if values[0] == '<X>':
+            if values[0] in ['<X>', b'<X>']:
                 continue # Header row
             if len(values) < 2 and len(values) != 0:
                 try:
