@@ -38,10 +38,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Varify MySQL connection
+      - name: Verify MySQL connection
         env:
-          PORT: ${{ job.services.mysql.ports[3306] }}
-        run: mysqladmin ping -h "127.0.0.1" -P "$PORT"
+          PORT: ${{ job.services.mysql.ports['3306'] }}
+          ROOT_PASS: ${{ job.services.mysql.env.MYSQL_ROOT_PASSWORD }}
+        run: mysqladmin ping -u "root" -p "$ROOT_PASS" -h "127.0.0.1" -P "$PORT"
+      - name: Create django db and user and grant full access
+        run: sudo bash scripts/mysql_setup.sh
       - name: Migration and Tests
         env:
           # These DBs and passwords are *not* production passwords.
