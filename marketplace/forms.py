@@ -20,11 +20,10 @@ class ModelFileField(forms.FileField):
         data = super(ModelFileField, self).clean(*args, **kwargs)
         if data is None:
             return data
-        file = UploadedFile(data.read())
         try:
-            content_type = file.content_type
+            content_type = data.content_type
         except Exception:
-            content_type = file.content_type_extra
+            content_type = data.content_type_extra
         data.seek(0)
 
         if self.mimetypes is not None and content_type not in self.mimetypes:
