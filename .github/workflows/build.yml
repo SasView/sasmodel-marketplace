@@ -16,7 +16,6 @@ jobs:
             db_user: mysql
             db_password: test
             root_password: root
-            host: 127.0.0.1
     services:
       mysql:
         image: mysql:8.0
@@ -25,7 +24,6 @@ jobs:
           MYSQL_DATABASE: ${{ matrix.db }}
           MYSQL_USER: ${{ matrix.db_user }}
           MYSQL_PASSWORD: ${{ matrix.db_password }}
-          MYSQL_HOST: ${{ matrix.host }}
         ports:
           - '3306:3306'
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -45,8 +43,7 @@ jobs:
         env:
           PORT: ${{ job.services.mysql.ports['3306'] }}
           ROOT_PASS: ${{ matrix.root_password }}
-          HOST: ${{ matrix.host }}
-        run: mysqladmin ping -u "root" -p "$ROOT_PASS" -h "$HOST" -P "$PORT"
+        run: mysqladmin ping -u "root" -p "$ROOT_PASS" -P "$PORT"
       - name: Create django db and user and grant full access
         run: sudo bash scripts/mysql_setup.sh
       - name: Migration and Tests
@@ -54,7 +51,6 @@ jobs:
           # These DBs and passwords are *not* production passwords.
           # They are throwaways for testing transient github instances
           DB: ${{ matrix.db }}
-          DB_HOST: ${{ matrix.host }}
           DB_PORT: ${{ job.services.mysql.ports['3306'] }}
           DB_USER: ${{ matrix.db_user }}
           DB_PASSWORD: ${{ matrix.db_password }}
