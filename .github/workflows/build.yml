@@ -27,6 +27,7 @@ jobs:
           MYSQL_USER: ${{ matrix.db_user }}
           MYSQL_PASSWORD: ${{ matrix.db_password }}
           MYSQL_HOST: ${{ matrix.host }}
+          DB_PARAMS: ${{ job.services.mysql }}
         ports:
           - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -44,13 +45,7 @@ jobs:
           pip install -r requirements.txt
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start
-      - name: Verify MySQL connection
-        env:
-          PORT: ${{ job.services.mysql.ports['3306'] }}
-          ROOT_PASS: ${{ matrix.root_password }}
-          HOST: ${{ matrix.host }}
-        run: mysqladmin ping -u "root" -p "$ROOT_PASS" -h "$HOST" -P "$PORT"
-      - name: Create django db and user and grant full access
+      - name: Create django db and user; grant full access
         run: sudo bash scripts/mysql_setup.sh
       - name: Migration and Tests
         env:
