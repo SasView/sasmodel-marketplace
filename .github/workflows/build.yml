@@ -18,20 +18,16 @@ jobs:
             db_password: test
             root_password: root
             host: 172.18.0.1
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ matrix.root_password }}
-          MYSQL_DATABASE: ${{ matrix.db_name }}
-          MYSQL_USER: ${{ matrix.db_user }}
-          MYSQL_PASSWORD: ${{ matrix.db_password }}
-          MYSQL_HOST: ${{ matrix.host }}
-          DB_PARAMS: ${{ job.services.mysql }}
-        ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    env:
+      MYSQL_DATABASE: marketplace
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
     steps:
+      # MySQL is installed natively on Ubuntu 20.04 - no need to add as a service, simply start it
+      - name: Set up MySQL
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE ${{ env.MYSQL_DATABASE }};' -u${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }}
       - uses: actions/checkout@v2
       - name: install prerequisites
         run: sudo apt-get install -y python3-dev python3-setuptools libpq-dev apache2-dev mysql-client
@@ -43,19 +39,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Start mysql service
-        run: sudo /etc/init.d/mysql start
-      - name: Create django db and user; grant full access
-        run: sudo bash scripts/mysql_setup.sh
       - name: Migration and Tests
-        env:
-          # These DBs and passwords are *not* production passwords.
-          # They are throwaways for testing transient github instances
-          DB: ${{ matrix.db_name }}
-          DB_HOST: ${{ matrix.host }}
-          DB_PORT: ${{ job.services.mysql.ports['3306'] }}
-          DB_USER: ${{ matrix.db_user }}
-          DB_PASSWORD: ${{ matrix.db_password }}
         run: |
           cp sasmarket/settings.py.example sasmarket/settings.py
           python manage.py migrate
