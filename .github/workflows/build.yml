@@ -10,7 +10,7 @@ jobs:
         # Keep general for future DB transitions
         db: [ mysql ]
         # Keep general for future python version compatibility
-        python-version: [ 3.8, 3.9, 3.10 ]
+        python-version: [ '3.8', '3.9', '3.10' ]
         include:
           - db: mysql
             host: 172.18.0.1
