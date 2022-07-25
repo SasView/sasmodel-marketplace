@@ -1,4 +1,4 @@
-from django.urls import path as url
+from django.urls import re_path as url
 from django.contrib.auth import views as auth_views
 from . import views
 from . import receivers
