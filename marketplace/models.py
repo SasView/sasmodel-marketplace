@@ -8,6 +8,28 @@ from .validators import validate_comma_separated_float_list
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete, post_save
 
+SASVIEW_VERSIONS = (
+    ('5.0.5', '5.0.5'),
+    ('5.0.4', '5.0.4'),
+    ('5.0.3', '5.0.3'),
+    ('5.0.2', '5.0.2'),
+    ('5.0.1', '5.0.1'),
+    ('5.0.0', '5.0.0'),
+    ('4.2.2', '4.2.2'),
+    ('4.2.1', '4.2.1'),
+    ('4.2.0', '4.2.0'),
+    ('4.1.2', '4.1.2'),
+    ('4.1.1', '4.1.1'),
+    ('4.1.0', '4.1.0'),
+    ('4.0.1', '4.0.1'),
+    ('4.0.0', '4.0.0'),
+    ('3.1.3', '3.1.3'),
+    ('3.1.2', '3.1.2'),
+    ('3.1.1', '3.1.1'),
+    ('3.1.0', '3.1.0'),
+    ('3.0.0', '3.0.0'),
+)
+
 def truncate(string, length):
     if len(string) > length:
         string = string[:length-3] + "..."
@@ -41,6 +63,8 @@ class SasviewModel(models.Model):
     verfied_date = models.DateTimeField(null=True,blank=True)
 
     in_library = models.BooleanField(default=False)
+    model_version = models.PositiveSmallIntegerField(default=1, null=False, blank=False)
+    sasview_version = models.CharField(max_length='6', choices=SASVIEW_VERSIONS, default=None, null=True, blank=True)
 
     def verify(self, user):
         if not user.is_staff:

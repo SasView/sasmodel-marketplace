@@ -88,7 +88,7 @@ class SasviewModelForm(ModelForm):
         " the model's page."))
     class Meta:
         model = SasviewModel
-        fields = ("name", "category", "description", "example_data")
+        fields = ("name", "category", "description", "example_data", "sasview_version")
         help_texts = {
             'description': ("LaTeX formatting is supported. Use $...$ to"
                 " denote inline maths, and $$...$$ or \\[...\\] to denote"
