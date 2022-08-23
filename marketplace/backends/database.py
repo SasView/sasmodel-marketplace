@@ -1,6 +1,5 @@
 # DatabaseStorage for django.
 # 2009 (c) GameKeeper Gambling Ltd, Ivanov E.
-import base64
 from io import StringIO # Python 3
 from urllib import parse as urlparse # Python 3
 import time
@@ -9,7 +8,6 @@ from django.utils.deconstruct import deconstructible
 from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import Storage
-from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
 
 @deconstructible
@@ -40,7 +38,7 @@ class DatabaseStorage(Storage):
             row = cursor.fetchone()
             if row is None:
                 return None
-            inMemFile = StringIO(self._sanitize(row[0]))
+            inMemFile = StringIO(row[0].decode())
             inMemFile.name = name
             inMemFile.mode = mode
 
@@ -114,6 +112,3 @@ class DatabaseStorage(Storage):
                 return 0
             else:
                 return int(row[0])
-
-    def _sanitize(self, data):
-        return base64.b64decode(data).decode().replace("\\\\", "\\").replace("\\012", "\n").strip("::bytea").strip("'")
