@@ -96,8 +96,12 @@ class SasviewModelForm(ModelForm):
         }
 
 class ModelFileForm(ModelForm):
-    model_file = ModelFileField(allow_empty_file=False,
-        mimetypes=["text/x-c", "text/x-csrc", "text/x-python", "text/plain"], max_size=50*2**10)
+    model_file = ModelFileField(
+        allow_empty_file=False,
+        mimetypes=["text/x-c", "text/x-csrc",  # C++ files (.c)
+                   "text/x-python", "text/x-python-script",  # Python files (.py)
+                   "text/plain"],  # Plain text files (.txt)
+        max_size=50*2**10)
     class Meta:
         model = ModelFile
         fields = ("model_file",)
