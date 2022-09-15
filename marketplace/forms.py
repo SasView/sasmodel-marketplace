@@ -5,6 +5,7 @@ from django.core.files.uploadedfile import UploadedFile
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.template.defaultfilters import filesizeformat
+from magic import Magic
 from .models import SasviewModel
 from .models import ModelFile
 from .models import Comment
@@ -21,7 +22,8 @@ class ModelFileField(forms.FileField):
         if data is None:
             return data
         try:
-            content_type = data.content_type
+            f = Magic(mime=True)
+            content_type = f.from_buffer(data)
         except Exception:
             content_type = data.content_type_extra
         data.seek(0)
