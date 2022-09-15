@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from django.db.models.signals import pre_delete, post_save
 
 SASVIEW_VERSIONS = (
+    ("-----", "-----"),
     ('5.0.5', '5.0.5'),
     ('5.0.4', '5.0.4'),
     ('5.0.3', '5.0.3'),
