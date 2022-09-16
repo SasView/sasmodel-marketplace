@@ -23,8 +23,8 @@ class ModelFileField(forms.FileField):
             return data
         try:
             f = Magic(mime=True)
-            content_type = f.from_buffer(data)
-        except Exception:
+            content_type = f.from_buffer(data.file.read())
+        except Exception as e:
             content_type = data.content_type_extra
         data.seek(0)
 
