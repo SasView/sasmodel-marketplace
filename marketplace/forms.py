@@ -1,7 +1,7 @@
+import os
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import UploadedFile
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.template.defaultfilters import filesizeformat
@@ -11,16 +11,19 @@ from .models import ModelFile
 from .models import Comment
 from .models import Category
 
+
 class ModelFileField(forms.FileField):
     def __init__(self, *args, **kwargs):
         self.mimetypes = kwargs.pop('mimetypes')
         self.max_size = kwargs.pop('max_size')
+        self.file_extensions = kwargs.pop('file_extensions') if 'file_extensions' in kwargs else None
         super(ModelFileField, self).__init__(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
         data = super(ModelFileField, self).clean(*args, **kwargs)
         if data is None:
             return data
+        extension = os.path.splitext(data.name)[-1]
         try:
             f = Magic(mime=True)
             content_type = f.from_buffer(data.file.read())
@@ -30,15 +33,14 @@ class ModelFileField(forms.FileField):
 
         if self.mimetypes is not None and content_type not in self.mimetypes:
             raise ValidationError(
-                ("Files of type %(content_type)s cannot be uploaded. Please select a file of type %(accepted_types)s."),
-                params={ 'content_type': content_type, 'accepted_types': self.mimetypes }
-            )
-        if self.max_size is not None and data.size > self.max_size:
+                f"Files of type {content_type} cannot be uploaded. Please select a file of type {self.mimetypes}.")
+        if self.file_extensions is not None and extension not in self.file_extensions:
             raise ValidationError(
-                ("Files must be smaller than %(file_size)s."),
-                params={ 'file_size': filesizeformat(self.max_size) }
-            )
+                f"Files of type {extension} cannot be uploaded. Please select a file of type {self.file_extensions}.")
+        if self.max_size is not None and data.size > self.max_size:
+            raise ValidationError(f"Files must be smaller than {filesizeformat(self.max_size)}.")
         return data
+
 
 class ExampleDataField(ModelFileField):
     def clean(self, *args, **kwargs):
@@ -103,6 +105,7 @@ class ModelFileForm(ModelForm):
         mimetypes=["text/x-c", "text/x-csrc",  # C++ files (.c)
                    "text/x-python", "text/x-python-script",  # Python files (.py)
                    "text/plain"],  # Plain text files (.txt)
+        file_extensions=['.c', '.py'],
         max_size=50*2**10)
     class Meta:
         model = ModelFile
