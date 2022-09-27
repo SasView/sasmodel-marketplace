@@ -93,8 +93,8 @@ class SasviewModelTests(TestCase):
             'description': model.description,
             'category': None
         }
-        upload = open('marketplace/test_data/M1 [guinier]_out.txt', 'rb')
-        file_dict = { 'example_data': SimpleUploadedFile(upload.name, upload.read()) }
+        upload = open('marketplace/test_data/M1 [guinier]_out.txt', 'r')
+        file_dict = { 'example_data': SimpleUploadedFile(upload.name, upload.read().encode()) }
         form = SasviewModelForm(post_dict, file_dict)
 
         self.assertTrue(form.is_valid())
@@ -143,7 +143,8 @@ class UserTests(TestCase):
     def test_sign_out(self):
         user = create_user(sign_in=True, client=self.client)
         response = self.client.get(reverse('logout'), follow=True)
-        self.assertContains(response, "Log In")
+        self.assertIn("Log in", response.rendered_content)
+        self.assertEqual(response.status_code, 200)
 
     def test_profile_permissions(self):
         other_user = create_user()

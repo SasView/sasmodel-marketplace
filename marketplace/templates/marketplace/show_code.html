@@ -25,7 +25,7 @@
     <li><a href="{% url 'show_file' file_id=file_object.id %}">{{ file_object.name }}</a></li>
 </ol>
 
-<h2>{{ file_object.model.name }} - {{ file_object.name }}</h1>
+<h1>{{ file_object.model.name }} - {{ file_object.name }}</h1>
 
 {% if file_content %}
 <pre>

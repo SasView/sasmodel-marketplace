@@ -1,22 +1,14 @@
 # DatabaseStorage for django.
 # 2009 (c) GameKeeper Gambling Ltd, Ivanov E.
-try:
-    import StringIO # Python 2
-except:
-    from io import StringIO # Python 3
-try:
-    import urlparse # Python 2
-except:
-    from urllib import parse as urlparse # Python 3
+from io import StringIO # Python 3
+from urllib import parse as urlparse # Python 3
 import time
 import os
 from django.utils.deconstruct import deconstructible
 from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import Storage
-from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
-import psycopg2
 
 @deconstructible
 class DatabaseStorage(Storage):
@@ -35,17 +27,18 @@ class DatabaseStorage(Storage):
     def _open(self, name, mode='rb'):
         """Open a file from database.
 
-        @param name filename or relative path to file based on base_url. path should contain only "/", but not "\". Apache sends pathes with "/".
-        If there is no such file in the db, returs None
+        @param name filename or relative path to file based on base_url. path should contain only "/", but not "\".
+            Apache sends paths with "/".
+        If there is no such file in the db, returns None
         """
         assert mode == 'rb', "You've tried to open binary file without specifying binary mode! You specified: %s"%mode
 
         with connection.cursor() as cursor:
-            cursor.execute("SELECT {} FROM {} WHERE {} = '{}'".format(self.blob_column,self.db_table,self.fname_column,name))
+            cursor.execute(f"SELECT {self.blob_column} FROM {self.db_table} WHERE {self.fname_column} = '{name}'")
             row = cursor.fetchone()
             if row is None:
                 return None
-            inMemFile = StringIO.StringIO(row[0])
+            inMemFile = StringIO(row[0].decode())
             inMemFile.name = name
             inMemFile.mode = mode
 
@@ -59,7 +52,7 @@ class DatabaseStorage(Storage):
         @note '\' in path will be converted to '/'.
         """
         name = name.replace('\\', '/')
-        binary = psycopg2.Binary(content.read())
+        binary = content.read()
         size = binary.__sizeof__()
 
         with connection.cursor() as cursor:

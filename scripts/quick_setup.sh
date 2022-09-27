@@ -14,20 +14,21 @@ cd "$TARGETDIRECTORYPATH"
 # Install all the relevant software via apt
 sudo apt install -y apache2
 sudo apt install -y apache2-dev
-sudo apt install -y postgresql
+sudo apt install -y mysql
 sudo apt install -y python3-dev
 sudo apt install -y python3-setuptools
+sudo apt install -y libpq-dev
 
 # Setup Python and get pip installed
-sudo ln -s /usr/bin/python3 /usr/bin/python 
+sudo ln -s /usr/bin/python3 /usr/bin/python
 sudo python /usr/lib/python3/dist-packages/easy_install.py pip
 
 # Clone the git repo and install the required Python packages for the marketplace
-sudo -H pip install -r "$TARGETDIRECTORYPATH/p3-requirements.txt"
+sudo -H pip install -r "$TARGETDIRECTORYPATH/requirements.txt"
 
-# Set up Postgres
-echo "postgres:postgres" | sudo chpasswd
-sudo su - postgres -c "$TARGETDIRECTORYPATH/scripts/postgres_setup.sh"
+# Set up MySQL
+echo "mysql:mysql" | sudo chpasswd
+sudo su - mysql -c "$TARGETDIRECTORYPATH/scripts/mysql_setup.sh"
 
 # Initialise the marketplace
 sudo cp "$TARGETDIRECTORYPATH/sasmarket/settings.py.quicksetup.example" "$TARGETDIRECTORYPATH/sasmarket/settings.py"
@@ -38,7 +39,7 @@ sudo cp "$TARGETDIRECTORYPATH/sasmarket/marketplace.sasview.org.conf.example" "/
 mod_wsgi-express module-config | sudo tee /etc/apache2/mods-enabled/wsgi_mod.load
 
 git clone https://github.com/SasView/sasmodels
-sudo ".$TARGETDIRECTORYPATH/scripts/update_sasmodels.sh"
+sudo "$TARGETDIRECTORYPATH/scripts/update_sasmodels.sh"
 
 # Restart the Apache web service
 sudo rm /etc/apache2/sites-enabled/000-default.conf
