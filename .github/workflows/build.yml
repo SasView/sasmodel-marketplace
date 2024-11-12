@@ -4,7 +4,7 @@ on: [push, pull_request]
 jobs:
   vm-job:
     name: build
-    runs-on: [ubuntu-24.04, ubuntu-latest]
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         # Keep general for future DB transitions
