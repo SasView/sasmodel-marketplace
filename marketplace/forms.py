@@ -103,7 +103,7 @@ class ModelFileForm(ModelForm):
     model_file = ModelFileField(
         allow_empty_file=False,
         mimetypes=["text/x-c", "text/x-csrc",  # C++ files (.c)
-                   "text/x-python", "text/x-python-script",  # Python files (.py)
+                   "text/x-python", "text/x-python-script", "text/x-script.python",  # Python files (.py)
                    "text/plain"],  # Plain text files (.txt)
         file_extensions=['.c', '.py'],
         max_size=50*2**10)
