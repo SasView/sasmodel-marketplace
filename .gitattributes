@@ -1,0 +1,3 @@
+# Store and check out text files with LF endings on every platform, so a file
+# copied from a Windows checkout to the Linux server is never converted to CRLF.
+* text=auto eol=lf

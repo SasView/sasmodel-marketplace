@@ -10,3 +10,10 @@ virtualenv
 .dropbox
 .dropbox-dist
 Dropbox
+
+# Server runtime files
+*.log
+*.sql
+
+# IDE settings
+.idea/
