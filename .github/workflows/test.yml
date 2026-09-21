@@ -1,0 +1,66 @@
+name: Tests
+
+on:
+  push:
+    branches: [master, dev]
+  pull_request:
+    branches: [master, dev]
+  workflow_dispatch:
+  # Lets the deploy workflow run these tests and deploy only if they pass.
+  workflow_call:
+
+jobs:
+  test:
+    name: test (Python ${{ matrix.python-version }})
+    # ubuntu-22.04 is the newest runner image that still provides Python 3.8,
+    # which is what the live sites run. Move both forward together in the
+    # Python/Django upgrade.
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version: ['3.8']
+
+    steps:
+      # MySQL is preinstalled on the runner image (root password "root"). Create
+      # the database and the user that sasmarket/settings.py.example expects.
+      - name: Start MySQL
+        run: |
+          sudo systemctl start mysql.service
+          mysql -uroot -proot -e "CREATE DATABASE marketplace CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+          for host in localhost 127.0.0.1; do
+            mysql -uroot -proot -e "CREATE USER 'mysql'@'$host' IDENTIFIED BY 'test'; GRANT ALL PRIVILEGES ON *.* TO 'mysql'@'$host';"
+          done
+
+      - uses: actions/checkout@v4
+
+      - name: Install system libraries
+        # mysqlclient compiles against libmysqlclient; python-magic needs libmagic.
+        run: sudo apt-get update && sudo apt-get install -y libmysqlclient-dev pkg-config libmagic1
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Configure settings
+        run: cp sasmarket/settings.py.example sasmarket/settings.py
+
+      - name: Django system checks
+        run: python manage.py check
+
+      # Fails if the models have changed without a matching migration file --
+      # the gap that left migration 0020 uncommitted from 2021 to 2026.
+      - name: Check for missing migrations
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Migrate
+        run: python manage.py migrate
+
+      - name: Run tests
+        run: python manage.py test
