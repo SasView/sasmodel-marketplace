@@ -477,4 +477,5 @@ class DeployedVersionTagTests(TestCase):
 
     def test_base_template_has_footer(self):
         response = self.client.get(reverse("index"))
-        self.assertContains(response, 'class="site-footer"')
+        self.assertContains(response, '<footer class="container site-footer">')
+        self.assertContains(response, "version unknown")
