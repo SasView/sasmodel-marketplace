@@ -1,8 +1,7 @@
 name: Tests
 
 on:
-  push:
-    branches: [master, dev]
+  # No push trigger: pushes to master/dev run these tests through deploy.yml.
   pull_request:
     branches: [master, dev]
   workflow_dispatch:
