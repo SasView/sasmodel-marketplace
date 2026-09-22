@@ -37,6 +37,7 @@ def parse_all_models():
         return
     
     logging.info("Uploading sasmodels from {}".format(SASMODELS_DIR))
+    seen = set()
     # TODO: Better glob so __init__ does't need to be manually skipped
     for file_path in glob(os.path.join(models_dir, "*.py")):
         file_name = os.path.split(file_path)[-1]
@@ -45,14 +46,14 @@ def parse_all_models():
             continue
         file_name = os.path.splitext(file_name)[0]
         model_name = file_name.replace('_', ' ').title()
+        seen.add(model_name)
 
         file_contents = ''
         with open(file_path, 'r') as f:
             file_contents = f.read() 
 
-        # BUG: This assumes model names never change, so if the name of a python
-        # model file is changed, a new model will be created in the marketplace
-        # instead of renaming the existing one
+        # Models are matched by name, so a model file renamed in sasmodels arrives as a new
+        # model; the old one is reported below rather than deleted.
         model = None
         try:
             model = SasviewModel.objects.get(name=model_name, in_library=True)
@@ -66,12 +67,10 @@ def parse_all_models():
             print("Created {}".format(model_name))
             upload_model_files(updated_model, file_path)
         else:
-            # Check if model needs updating
-            # BUG: If only the c file is changed, but not the python file,
-            # the updated c file won't be uploaded. Editing the python file
-            # triggers the upload of both the c & the python files.
+            # Update if the description, the category or the content of either file changed
             if not model.description == updated_model.description or \
-                not model.category == updated_model.category:
+                not model.category == updated_model.category or \
+                stored_files(model) != files_on_disk(file_path):
                 model.description = updated_model.description
                 model.category = updated_model.category
                 model.save()
@@ -79,7 +78,35 @@ def parse_all_models():
                 for model_file in ModelFile.objects.filter(model__pk=model.id):
                     model_file.delete()
                 upload_model_files(model, file_path)
+
+    # Library models with no file left in sasmodels (renamed or removed there) are kept, since
+    # users may link to them, but reported so a maintainer can decide what to do.
+    for name in SasviewModel.objects.filter(in_library=True).exclude(
+            name__in=seen).values_list("name", flat=True):
+        logging.warning("In the library but not in sasmodels (left unchanged): {}".format(name))
+        print("Not in sasmodels (left unchanged): {}".format(name))
     logging.info("Upload complete")
+
+def files_on_disk(file_path):
+    # (str) -> ({str: bytes})
+    # Contents of file_path.py and file_path.c, whichever exist, keyed by file name
+    files = {}
+    base = os.path.splitext(file_path)[0]
+    for ext in (".py", ".c"):
+        if os.path.isfile(base + ext):
+            with open(base + ext, 'rb') as f:
+                files[os.path.basename(base + ext)] = f.read()
+    return files
+
+def stored_files(model):
+    # (SasviewModel) -> ({str: bytes})
+    # Contents of the files currently stored for model, keyed by file name
+    files = {}
+    for model_file in ModelFile.objects.filter(model__pk=model.id):
+        stored = model_file.model_file.storage.open(model_file.model_file.name)
+        # DatabaseStorage returns the blob decoded as text, or None if it is missing
+        files[model_file.name] = None if stored is None else stored.read().encode()
+    return files
 
 def upload_file(model, file_path):
     # (SasviewModel, str) -> ()

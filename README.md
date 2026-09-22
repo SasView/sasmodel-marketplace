@@ -87,8 +87,11 @@ Both sites run on the same host, each from its own checkout and virtual environm
 - **Changes take effect only after `systemctl restart`.** The units have no reload action, and with
   `DEBUG = False` Django caches templates too.
 - After adding or changing static files, run `python manage.py collectstatic` in the checkout.
-- The bundled SasView models are refreshed from a `sasmodels` checkout by
-  `scripts/update_sasmodels.sh` and `upload_sasmodels.py`.
+- The bundled SasView models (`in_library`) come from `upload_sasmodels.py`, run against a
+  `sasmodels` checkout named by `SASMODELS_DIR`. It adds new models and updates any whose
+  description, category or file contents changed; it never deletes a model, and only reports
+  library models that no longer exist in sasmodels. On the production host a weekly job runs it,
+  as the unprivileged deploy account, against the latest sasmodels **release** tag.
 
-Deployment is currently done by hand on the server. An automated deploy — tests pass on GitHub,
-then the new code is pulled onto the matching site and the service restarted — is being set up.
+Deployment is automated: a merge to `dev` or `master` runs the tests, then deploys that branch
+to its site (`.github/workflows/deploy.yml`).
