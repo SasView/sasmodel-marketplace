@@ -1,0 +1,47 @@
+name: Deploy
+
+# A push to dev deploys marketplacedev.sasview.org; a push to master deploys
+# marketplace.sasview.org -- only after the tests pass.
+#
+# The runner SSHes to danse2 as the mpdeploy account with the key held in the
+# branch's GitHub environment (production: master only; staging: dev only).
+# On danse2 each key is pinned to a forced command that runs the root-owned
+# /usr/local/sbin/marketplace-deploy for its branch, so this workflow cannot
+# choose what runs there: the deploy steps live on the server, not in this repo.
+
+on:
+  push:
+    branches: [master, dev]
+  workflow_dispatch:      # manual redeploy; the environments still limit it to master/dev
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false   # never kill a deploy halfway
+
+jobs:
+  tests:
+    uses: ./.github/workflows/test.yml
+
+  deploy:
+    needs: tests
+    if: github.ref_name == 'master' || github.ref_name == 'dev'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name == 'master' && 'production' || 'staging' }}
+      url: ${{ github.ref_name == 'master' && 'https://marketplace.sasview.org' || 'https://marketplacedev.sasview.org' }}
+    steps:
+      - name: Deploy over SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # danse2's host key, pinned: the job refuses to talk to anything else.
+          echo 'danse2.chem.utk.edu ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFSnMHZVwlqtKt+U+pu4fA7L8ifzUrnEhgTWaabTnR5C' > ~/.ssh/known_hosts
+          # No command is sent: the key's forced command on danse2 decides what runs.
+          ssh -T -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes \
+              -o StrictHostKeyChecking=yes mpdeploy@danse2.chem.utk.edu

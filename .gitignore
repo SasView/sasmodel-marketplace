@@ -14,6 +14,7 @@ Dropbox
 # Server runtime files
 *.log
 *.sql
+DEPLOYED
 
 # IDE settings
 .idea/
