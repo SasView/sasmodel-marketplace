@@ -1,0 +1,61 @@
+name: Back-merge master into dev
+
+# After a patch is merged straight into master, dev needs it too. This opens (or
+# updates) that PR. After a dev -> master promotion there is nothing to bring
+# back, and this does nothing.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: backmerge          # two pushes in quick succession must not race
+  cancel-in-progress: false
+
+jobs:
+  backmerge:
+    runs-on: ubuntu-24.04   # matches danse2; not ubuntu-latest, which moves to 26 in October
+    env:
+      BRANCH: backmerge-to-dev
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0    # the whole history: we compare two branches
+
+      - name: Does dev already have master's content?
+        id: check
+        run: |
+          # What would merging master into dev produce? If it is exactly what dev
+          # already is, there is nothing to bring back. This stays correct when dev
+          # is ahead of master, which it usually is.
+          if merged=$(git merge-tree --write-tree origin/dev origin/master) &&
+             [ "$merged" = "$(git rev-parse origin/dev^{tree})" ]; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open or update the back-merge PR
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          set -euo pipefail
+          git push --force origin "origin/master:refs/heads/$BRANCH"
+          if [ -n "$(gh pr list --head "$BRANCH" --base dev --state open --json number --jq '.[].number')" ]; then
+            echo "Existing back-merge PR updated to master's tip."
+          else
+            gh pr create --base dev --head "$BRANCH" \
+              --title "Back-merge master into dev" \
+              --body "Automatic: master has changes dev does not. Merge with a merge commit."
+          fi
+
+      - name: Nothing to back-merge
+        if: steps.check.outputs.needed == 'false'
+        run: |
+          git push --quiet origin --delete "$BRANCH" 2>/dev/null || true
+          echo "dev already has master's content."
