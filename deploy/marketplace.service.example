@@ -1,0 +1,27 @@
+# systemd unit running the marketplace under gunicorn.
+# Install as /etc/systemd/system/marketplace.service, then:
+#   sudo systemctl daemon-reload && sudo systemctl enable --now marketplace.service
+# Mirrors the live unit on danse2. The dev site uses marketplacedev.service with
+# "marketplace" replaced by "marketplacedev" in the paths and socket name.
+#
+# There is no ExecReload and gunicorn runs without --reload, so code and
+# template changes take effect only after `systemctl restart`.
+
+[Unit]
+Description=Gunicorn instance to serve the SasView marketplace
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/marketplace.sasview.org
+RuntimeDirectory=marketplace-gunicorn
+ExecStart=/var/www/marketplace.sasview.org/virtualenv/bin/gunicorn \
+  --workers 3 \
+  --bind unix:/run/marketplace-gunicorn/marketplace.sock \
+  sasmarket.wsgi:application
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
