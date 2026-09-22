@@ -1,5 +1,6 @@
 {% load bootstrap3 %}
 {% load static %}
+{% load deploy_info %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -66,5 +67,8 @@
         {% block content %}
         {% endblock content %}
     </div>
+    <footer class="container site-footer">
+        SasView Marketplace &middot; {% deployed_version %}
+    </footer>
 </body>
 </html>
