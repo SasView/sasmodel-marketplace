@@ -30,14 +30,14 @@ jobs:
             mysql -uroot -proot -e "CREATE USER 'mysql'@'$host' IDENTIFIED BY 'test'; GRANT ALL PRIVILEGES ON *.* TO 'mysql'@'$host';"
           done
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install system libraries
         # mysqlclient compiles against libmysqlclient; python-magic needs libmagic.
         run: sudo apt-get update && sudo apt-get install -y libmysqlclient-dev pkg-config libmagic1
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip

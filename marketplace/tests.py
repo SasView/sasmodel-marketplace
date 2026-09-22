@@ -1,4 +1,8 @@
 from builtins import bytes
+import tempfile
+from pathlib import Path
+from unittest import mock
+from django.template import Context, Template
 from django.test import TestCase, RequestFactory
 from django.utils import timezone
 from django.urls import reverse
@@ -7,6 +11,7 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from marketplace.models import SasviewModel, ModelFile, Comment, Category, Vote
 from marketplace.forms import SasviewModelForm
+from marketplace.templatetags import deploy_info
 
 def create_user(username=None, email=None, password="testpassword",
     commit=True, sign_in=False, client=None):
@@ -446,3 +451,30 @@ class SearchTests(TestCase):
 
         response = self.client.get(reverse('search'), { 'query': 'keyword', 'verified': '1' })
         self.assertContains(response, "Guinier-Porod")
+
+
+class DeployedVersionTagTests(TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.addCleanup(deploy_info.read_deployed.cache_clear)
+        deploy_info.read_deployed.cache_clear()
+
+    def render(self):
+        return Template("{% load deploy_info %}{% deployed_version %}").render(Context())
+
+    def test_no_file_shows_unknown(self):
+        with mock.patch.object(deploy_info, "DEPLOYED_FILE", Path(self.tmp.name) / "DEPLOYED"):
+            self.assertEqual(self.render(), "version unknown")
+
+    def test_file_shows_linked_short_sha(self):
+        path = Path(self.tmp.name) / "DEPLOYED"
+        path.write_text("34840cb69e6105ce45d463445f02067f05e67c51 master 2026-09-22T16:38Z\n")
+        with mock.patch.object(deploy_info, "DEPLOYED_FILE", path):
+            html = self.render()
+        self.assertIn('/commit/34840cb69e6105ce45d463445f02067f05e67c51">34840cb</a>', html)
+        self.assertIn("(master, deployed 2026-09-22)", html)
+
+    def test_base_template_has_footer(self):
+        response = self.client.get(reverse("index"))
+        self.assertContains(response, 'class="site-footer"')
