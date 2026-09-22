@@ -61,3 +61,11 @@ body {
 #comment-form div textarea {
     max-height: 110px;
 }
+
+.site-footer {
+    margin-top: 40px;
+    padding: 15px 0 25px;
+    border-top: 1px solid #e5e5e5;
+    color: #777;
+    font-size: 12px;
+}
