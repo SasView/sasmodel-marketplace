@@ -1,4 +1,4 @@
-Django==4.2.25
+Django==4.2.30
 django-bootstrap3==24.3
 python-magic==0.4.27
 django-mysql==4.14.0
