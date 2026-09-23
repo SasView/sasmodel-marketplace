@@ -34,7 +34,7 @@ class DatabaseStorage(Storage):
         assert mode == 'rb', "You've tried to open binary file without specifying binary mode! You specified: %s"%mode
 
         with connection.cursor() as cursor:
-            cursor.execute(f"SELECT {self.blob_column} FROM {self.db_table} WHERE {self.fname_column} = '{name}'")
+            cursor.execute(f"SELECT {self.blob_column} FROM {self.db_table} WHERE {self.fname_column} = %s", [name])
             row = cursor.fetchone()
             if row is None:
                 return None
@@ -58,8 +58,8 @@ class DatabaseStorage(Storage):
         with connection.cursor() as cursor:
             #todo: check result and do something (exception?) if failed.
             if self.exists(name, cursor=cursor):
-                cursor.execute("UPDATE {} SET {} = %s, {} = %s WHERE {} = '{}'".format(self.db_table,self.blob_column,self.size_column,self.fname_column,name),
-                                     (binary, size)  )
+                cursor.execute("UPDATE {} SET {} = %s, {} = %s WHERE {} = %s".format(self.db_table,self.blob_column,self.size_column,self.fname_column),
+                                     (binary, size, name))
             else:
                 cursor.execute("INSERT INTO {} VALUES(%s, %s, %s)".format(self.db_table), (name, binary, size))
 
@@ -70,7 +70,7 @@ class DatabaseStorage(Storage):
         if not cursor_supplied:
             cursor = connection.cursor()
 
-        cursor.execute("SELECT {} FROM {} WHERE {} = '{}'".format(self.fname_column,self.db_table,self.fname_column,name))
+        cursor.execute("SELECT {} FROM {} WHERE {} = %s".format(self.fname_column,self.db_table,self.fname_column), [name])
         row = cursor.fetchone()
 
         if not cursor_supplied:
@@ -95,7 +95,7 @@ class DatabaseStorage(Storage):
     def delete(self, name):
         with connection.cursor() as cursor:
             if self.exists(name, cursor):
-                cursor.execute("DELETE FROM {} WHERE {} = '{}'".format(self.db_table,self.fname_column,name))
+                cursor.execute("DELETE FROM {} WHERE {} = %s".format(self.db_table,self.fname_column), [name])
 
     def url(self, name):
         if self.base_url is None:
@@ -105,7 +105,7 @@ class DatabaseStorage(Storage):
     def size(self, name):
         with connection.cursor() as cursor:
 
-            cursor.execute("SELECT {} from {} where {} = '{}'".format(self.size_column,self.db_table,self.fname_column,name))
+            cursor.execute("SELECT {} from {} where {} = %s".format(self.size_column,self.db_table,self.fname_column), [name])
             row = cursor.fetchone()
 
             if row is None:

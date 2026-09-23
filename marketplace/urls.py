@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^comments/(?P<comment_id>[0-9]+)/delete/$', views.delete_comment, name='delete_comment'),
     url(r'^accounts/signup/$', views.sign_up, name='signup'),
     url(r'^accounts/login/$', auth_views.LoginView.as_view(), name='login'),
-    url(r'^accounts/logout/$', auth_views.LogoutView.as_view(), { 'next_page': views.index }, name='logout'),
+    url(r'^accounts/logout/$', auth_views.LogoutView.as_view(next_page='index'), name='logout'),
     url(r'^accounts/profile/$', views.profile, name='profile'),
     url(r'^accounts/user/(?P<user_id>[0-9]+)/$', views.profile, name='profile'),
     url(r'^accounts/password_change/done', views.password_change_done, name="password_change_done"),
