@@ -11,13 +11,13 @@ on:
 jobs:
   test:
     name: test (Python ${{ matrix.python-version }})
-    # ubuntu-22.04 is the newest runner image that still provides Python 3.8,
-    # which is what the live sites run. Move both forward together in the
-    # Python/Django upgrade.
-    runs-on: ubuntu-22.04
+    # Match danse2: Ubuntu 24.04, whose system Python 3.12 the live sites run.
+    # Move the image and the Python version together, and rename the required
+    # check in branch protection (dev and master) when the matrix changes.
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: ['3.8', '3.12']
+        python-version: ['3.12']
 
     steps:
       # MySQL is preinstalled on the runner image (root password "root"). Create
@@ -37,7 +37,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libmysqlclient-dev pkg-config libmagic1
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
