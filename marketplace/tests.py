@@ -495,6 +495,7 @@ class DeployedVersionTagTests(TestCase):
         self.assertIn("(master, deployed 2026-09-22)", html)
 
     def test_base_template_has_footer(self):
-        response = self.client.get(reverse("index"))
+        with mock.patch.object(deploy_info, "DEPLOYED_FILE", Path(self.tmp.name) / "DEPLOYED"):
+            response = self.client.get(reverse("index"))
         self.assertContains(response, '<footer class="container site-footer">')
         self.assertContains(response, "version unknown")
