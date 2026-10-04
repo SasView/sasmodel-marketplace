@@ -17,8 +17,8 @@ from marketplace.models import ModelFile
 # Points to a clone of the sasmodels repo
 SASMODELS_DIR = os.environ.get("SASMODELS_DIR", "../sasmodels")
 TAG_PATTERN = re.compile("(:[a-zA-Z]+:)") # Matches ':tag:'
-REF_DEF_PATTERN = re.compile("(.. \[#[a-zA-Z]*\])") # Matches '.. [#RefTag]'
-REF_PATTERN = re.compile("(\\\ \[#[a-zA-Z]*\]_)") # Matches '\ #[RefTag]_'
+REF_DEF_PATTERN = re.compile(r"(.. \[#[a-zA-Z]*\])") # Matches '.. [#RefTag]'
+REF_PATTERN = re.compile(r"(\\ \[#[a-zA-Z]*\]_)") # Matches '\ #[RefTag]_'
 UNDERLINE_PATTERN = re.compile("(-{3,})") # Matches 3 or more consecutive '-'s
 
 def _remove_all(pattern, string):
@@ -220,7 +220,7 @@ def parse_category(file_contents):
     # (str) -> (Category or None)
     # Get the model's category from the contents of its python file
     category_name = ""
-    category_regex= "category[\s]?=[\s]?[\"']([a-zA-Z\s:_-]*)[\"']"
+    category_regex= "category[\\s]?=[\\s]?[\"']([a-zA-Z\\s:_-]*)[\"']"
     category_result = None
     category_result = re.search(category_regex, file_contents)
 
