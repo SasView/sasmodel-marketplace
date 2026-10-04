@@ -134,6 +134,23 @@ class ModelFileTests(TestCase):
         self.assertEqual(len(all_files), 0)
 
 
+class DatabaseStorageTests(TestCase):
+    """File names reach the SQL as parameters, so quotes in them are harmless."""
+
+    def test_quoted_name_round_trip(self):
+        from django.core.files.base import ContentFile
+        from marketplace.backends.database import DatabaseStorage
+        storage = DatabaseStorage()
+        name = "it's a model'); DROP TABLE x; --.py"
+        self.assertFalse(storage.exists(name))
+        storage._save(name, ContentFile(b"first"))
+        self.assertTrue(storage.exists(name))
+        storage._save(name, ContentFile(b"second"))          # the UPDATE path
+        self.assertEqual(storage._open(name).read(), "second")
+        self.assertGreater(storage.size(name), 0)
+        storage.delete(name)
+        self.assertFalse(storage.exists(name))
+
 class UserTests(TestCase):
 
     def test_sign_in(self):
@@ -147,9 +164,11 @@ class UserTests(TestCase):
 
     def test_sign_out(self):
         user = create_user(sign_in=True, client=self.client)
-        response = self.client.get(reverse('logout'), follow=True)
-        self.assertIn("Log in", response.rendered_content)
+        response = self.client.post(reverse('logout'), follow=True)
         self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, reverse('index'))
+        self.assertNotIn('_auth_user_id', self.client.session)
+        self.assertContains(response, "Log In")
 
     def test_profile_permissions(self):
         other_user = create_user()
@@ -476,6 +495,7 @@ class DeployedVersionTagTests(TestCase):
         self.assertIn("(master, deployed 2026-09-22)", html)
 
     def test_base_template_has_footer(self):
-        response = self.client.get(reverse("index"))
+        with mock.patch.object(deploy_info, "DEPLOYED_FILE", Path(self.tmp.name) / "DEPLOYED"):
+            response = self.client.get(reverse("index"))
         self.assertContains(response, '<footer class="container site-footer">')
         self.assertContains(response, "version unknown")
