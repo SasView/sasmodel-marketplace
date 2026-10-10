@@ -242,7 +242,7 @@ def download_file(request, filename):
 
 @login_required
 def delete_file(request, file_id):
-    model_file = ModelFile.objects.filter(pk=file_id).first()
+    model_file = get_object_or_404(ModelFile, pk=file_id)
     model = check_owned_by_or_admin(request, model_file.model.id)
     if model != model_file.model:
         messages.error(request, "You are not authorised to delete this file.",
@@ -276,7 +276,7 @@ def edit_files(request, model_id):
 
 @login_required
 def delete_comment(request, comment_id):
-    comment = Comment.objects.filter(pk=comment_id).first()
+    comment = get_object_or_404(Comment, pk=comment_id)
     if comment.user != request.user:
         messages.error(request, "You are not authorised to delete this comment",
             extra_tags="danger")

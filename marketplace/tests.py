@@ -151,6 +151,49 @@ class DatabaseStorageTests(TestCase):
         storage.delete(name)
         self.assertFalse(storage.exists(name))
 
+class MissingDeletionTests(TestCase):
+
+    def setUp(self):
+        self.user = create_user(sign_in=True, client=self.client)
+
+    def test_missing_file_returns_404(self):
+        response = self.client.get(reverse('delete_file',
+            kwargs={'file_id': 99999}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_missing_comment_returns_404(self):
+        response = self.client.get(reverse('delete_comment',
+            kwargs={'comment_id': 99999}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_already_deleted_file_returns_404(self):
+        model_file = create_file(model=create_model(user=self.user))
+        url = reverse('delete_file', kwargs={'file_id': model_file.id})
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse('edit_files',
+            kwargs={'model_id': model_file.model.id}))
+        self.assertFalse(ModelFile.objects.filter(pk=model_file.id).exists())
+        self.assertEqual(self.client.get(url).status_code, 404)
+
+    def test_already_deleted_comment_returns_404(self):
+        comment = create_comment(user=self.user)
+        url = reverse('delete_comment', kwargs={'comment_id': comment.id})
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse('detail',
+            kwargs={'model_id': comment.model.id}))
+        self.assertFalse(Comment.objects.filter(pk=comment.id).exists())
+        self.assertEqual(self.client.get(url).status_code, 404)
+
+    def test_anonymous_missing_targets_require_login(self):
+        anonymous_client = self.client_class()
+        for view, parameter in (('delete_file', 'file_id'),
+                                ('delete_comment', 'comment_id')):
+            with self.subTest(view=view):
+                url = reverse(view, kwargs={parameter: 99999})
+                response = anonymous_client.get(url)
+                self.assertRedirects(response, reverse('login') + '?next=' + url)
+
+
 class UserTests(TestCase):
 
     def test_sign_in(self):
