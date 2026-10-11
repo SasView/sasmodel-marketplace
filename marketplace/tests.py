@@ -290,6 +290,15 @@ class UserTests(TestCase):
         my_files = ModelFile.objects.filter(model__pk=model.id)
         self.assertEqual(len(my_files), 0)
 
+    def test_file_delete_missing(self):
+        owner = create_user(sign_in=True, client=self.client)
+        model = create_model(user=owner)
+        create_file(model=model)
+
+        response = self.client.get(reverse('delete_file', kwargs={ 'file_id': 99999 }))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(ModelFile.objects.filter(model__pk=model.id).count(), 1)
+
     def test_comment_delete_permission(self):
         owner = create_user()
         comment = create_comment(user=owner)
@@ -311,6 +320,15 @@ class UserTests(TestCase):
             kwargs={ 'model_id': comment.model.id }))
         my_comments = Comment.objects.filter(user__pk=owner.id)
         self.assertEqual(len(my_comments), 0)
+
+    def test_comment_delete_missing(self):
+        owner = create_user(sign_in=True, client=self.client)
+        comment = create_comment(user=owner)
+
+        response = self.client.get(reverse('delete_comment',
+            kwargs={ 'comment_id': 99999 }))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(Comment.objects.filter(pk=comment.id).count(), 1)
 
     def test_verification_permissions(self):
         user = create_user(sign_in=True, client=self.client)
