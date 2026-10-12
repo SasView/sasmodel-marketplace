@@ -92,7 +92,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <a type="button" class="btn btn-danger" href="#" id="modal-del-btn">Delete</a>
+        <form action="#" method="post" id="modal-del-form" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
       </div>
     </div>
   </div>
@@ -102,15 +105,14 @@
     $('.delete-btn').click(function(event) {
         var modelData = {
         {% for model in models %}
-            '{{ model.id }}': {name: '{{ model.name }}', url: '{% url 'delete' model_id=model.id %}'},
+            '{{ model.id }}': {name: '{{ model.name|escapejs }}', url: '{% url 'delete' model_id=model.id %}'},
         {% endfor %}
         };
-        console.log(event.currentTarget);
-        modelId = $(event.currentTarget).attr('id');
-        modelName = modelData[modelId].name;
-        deleteUrl = modelData[modelId].url;
+        var modelId = $(event.currentTarget).attr('id');
+        var modelName = modelData[modelId].name;
+        var deleteUrl = modelData[modelId].url;
         $('#del-modal-content').text("Are you sure you want to delete " + modelName + "?");
-        $('#modal-del-btn').attr('href', deleteUrl);
+        $('#modal-del-form').attr('action', deleteUrl);
     });
 </script>
 
