@@ -151,8 +151,6 @@ class DatabaseStorageTests(TestCase):
         storage.delete(name)
         self.assertFalse(storage.exists(name))
 
-class MissingDeletionTests(TestCase):
-
     def test_saved_size_matches_content_length(self):
         from django.core.files.base import ContentFile
         from marketplace.backends.database import DatabaseStorage
@@ -173,6 +171,9 @@ class MissingDeletionTests(TestCase):
             with self.subTest(content=content):
                 storage._save(name, ContentFile(content))
                 self.assertEqual(storage.size(name), len(content))
+
+
+class MissingDeletionTests(TestCase):
 
     def setUp(self):
         self.user = create_user(sign_in=True, client=self.client)
