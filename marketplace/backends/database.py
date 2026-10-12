@@ -53,7 +53,7 @@ class DatabaseStorage(Storage):
         """
         name = name.replace('\\', '/')
         binary = content.read()
-        size = binary.__sizeof__()
+        size = len(binary)
 
         with connection.cursor() as cursor:
             #todo: check result and do something (exception?) if failed.
