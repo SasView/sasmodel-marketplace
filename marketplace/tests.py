@@ -153,6 +153,27 @@ class DatabaseStorageTests(TestCase):
 
 class MissingDeletionTests(TestCase):
 
+    def test_saved_size_matches_content_length(self):
+        from django.core.files.base import ContentFile
+        from marketplace.backends.database import DatabaseStorage
+        storage = DatabaseStorage()
+        for index, content in enumerate((b"", b"second", "\u00b5".encode("utf-8"))):
+            with self.subTest(content=content):
+                name = "size-test-{}.py".format(index)
+                storage._save(name, ContentFile(content))
+                self.assertEqual(storage.size(name), len(content))
+
+    def test_replacement_size_matches_content_length(self):
+        from django.core.files.base import ContentFile
+        from marketplace.backends.database import DatabaseStorage
+        storage = DatabaseStorage()
+        name = "replacement-size-test.py"
+        storage._save(name, ContentFile(b"original content"))
+        for content in (b"second", "\u00b5".encode("utf-8"), b""):
+            with self.subTest(content=content):
+                storage._save(name, ContentFile(content))
+                self.assertEqual(storage.size(name), len(content))
+
     def setUp(self):
         self.user = create_user(sign_in=True, client=self.client)
 
@@ -192,7 +213,6 @@ class MissingDeletionTests(TestCase):
                 url = reverse(view, kwargs={parameter: 99999})
                 response = anonymous_client.get(url)
                 self.assertRedirects(response, reverse('login') + '?next=' + url)
-
 
 class UserTests(TestCase):
 
