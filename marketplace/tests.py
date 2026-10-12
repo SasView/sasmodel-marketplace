@@ -151,6 +151,27 @@ class DatabaseStorageTests(TestCase):
         storage.delete(name)
         self.assertFalse(storage.exists(name))
 
+    def test_saved_size_matches_content_length(self):
+        from django.core.files.base import ContentFile
+        from marketplace.backends.database import DatabaseStorage
+        storage = DatabaseStorage()
+        for index, content in enumerate((b"", b"second", "\u00b5".encode("utf-8"))):
+            with self.subTest(content=content):
+                name = "size-test-{}.py".format(index)
+                storage._save(name, ContentFile(content))
+                self.assertEqual(storage.size(name), len(content))
+
+    def test_replacement_size_matches_content_length(self):
+        from django.core.files.base import ContentFile
+        from marketplace.backends.database import DatabaseStorage
+        storage = DatabaseStorage()
+        name = "replacement-size-test.py"
+        storage._save(name, ContentFile(b"original content"))
+        for content in (b"second", "\u00b5".encode("utf-8"), b""):
+            with self.subTest(content=content):
+                storage._save(name, ContentFile(content))
+                self.assertEqual(storage.size(name), len(content))
+
 class UserTests(TestCase):
 
     def test_sign_in(self):
