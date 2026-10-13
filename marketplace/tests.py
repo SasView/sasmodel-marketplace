@@ -3,7 +3,8 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 from django.template import Context, Template
-from django.test import TestCase, RequestFactory
+from django.db import IntegrityError, transaction
+from django.test import Client, TestCase, RequestFactory
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -179,32 +180,32 @@ class MissingDeletionTests(TestCase):
         self.user = create_user(sign_in=True, client=self.client)
 
     def test_missing_file_returns_404(self):
-        response = self.client.get(reverse('delete_file',
+        response = self.client.post(reverse('delete_file',
             kwargs={'file_id': 99999}))
         self.assertEqual(response.status_code, 404)
 
     def test_missing_comment_returns_404(self):
-        response = self.client.get(reverse('delete_comment',
+        response = self.client.post(reverse('delete_comment',
             kwargs={'comment_id': 99999}))
         self.assertEqual(response.status_code, 404)
 
     def test_already_deleted_file_returns_404(self):
         model_file = create_file(model=create_model(user=self.user))
         url = reverse('delete_file', kwargs={'file_id': model_file.id})
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertRedirects(response, reverse('edit_files',
             kwargs={'model_id': model_file.model.id}))
         self.assertFalse(ModelFile.objects.filter(pk=model_file.id).exists())
-        self.assertEqual(self.client.get(url).status_code, 404)
+        self.assertEqual(self.client.post(url).status_code, 404)
 
     def test_already_deleted_comment_returns_404(self):
         comment = create_comment(user=self.user)
         url = reverse('delete_comment', kwargs={'comment_id': comment.id})
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertRedirects(response, reverse('detail',
             kwargs={'model_id': comment.model.id}))
         self.assertFalse(Comment.objects.filter(pk=comment.id).exists())
-        self.assertEqual(self.client.get(url).status_code, 404)
+        self.assertEqual(self.client.post(url).status_code, 404)
 
     def test_anonymous_missing_targets_require_login(self):
         anonymous_client = self.client_class()
@@ -212,7 +213,7 @@ class MissingDeletionTests(TestCase):
                                 ('delete_comment', 'comment_id')):
             with self.subTest(view=view):
                 url = reverse(view, kwargs={parameter: 99999})
-                response = anonymous_client.get(url)
+                response = anonymous_client.post(url)
                 self.assertRedirects(response, reverse('login') + '?next=' + url)
 
 class UserTests(TestCase):
@@ -299,7 +300,7 @@ class UserTests(TestCase):
         model = create_model(user=owner)
 
         # Check unauthorised user can't delete
-        response = self.client.get(reverse('delete',
+        response = self.client.post(reverse('delete',
             kwargs={ 'model_id': model.id }))
         self.assertRedirects(response, reverse('detail',
             kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
@@ -308,7 +309,7 @@ class UserTests(TestCase):
 
         # Test authorised user can delete
         self.client.force_login(owner)
-        response = self.client.get(reverse('delete',
+        response = self.client.post(reverse('delete',
             kwargs={ 'model_id': model.id }))
         self.assertRedirects(response, reverse('profile'),
             fetch_redirect_response=False)
@@ -338,7 +339,7 @@ class UserTests(TestCase):
         model_file = create_file(model=model)
 
         # Check unauthorised user can't delete
-        response = self.client.get(reverse('delete_file',
+        response = self.client.post(reverse('delete_file',
             kwargs={ 'file_id': model_file.id }), follow=True)
         self.assertRedirects(response, reverse('detail',
             kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
@@ -347,7 +348,7 @@ class UserTests(TestCase):
 
         self.client.force_login(owner)
         # Check authorised user can delete
-        response = self.client.get(reverse('delete_file',
+        response = self.client.post(reverse('delete_file',
             kwargs={ 'file_id': model_file.id }))
         self.assertRedirects(response, reverse('edit_files',
             kwargs={ 'model_id': model.id }), fetch_redirect_response=False)
@@ -360,7 +361,7 @@ class UserTests(TestCase):
         current = create_user(sign_in=True, client=self.client)
 
         # Check unauthorised user can't delete
-        response = self.client.get(reverse('delete_comment',
+        response = self.client.post(reverse('delete_comment',
             kwargs={ 'comment_id': comment.id }))
         self.assertRedirects(response, reverse('detail',
             kwargs={ 'model_id': comment.model.id }))
@@ -369,7 +370,7 @@ class UserTests(TestCase):
 
         # Check authorised user can delete
         self.client.force_login(owner)
-        response = self.client.get(reverse('delete_comment',
+        response = self.client.post(reverse('delete_comment',
             kwargs={ 'comment_id': comment.id }))
         self.assertRedirects(response, reverse('detail',
             kwargs={ 'model_id': comment.model.id }))
@@ -381,7 +382,7 @@ class UserTests(TestCase):
         model = create_model(user=user)
 
         # Check unauthorised user can't verify
-        response = self.client.get(reverse('verify', kwargs={'model_id':model.id}),
+        response = self.client.post(reverse('verify', kwargs={'model_id':model.id}),
             follow=True)
         self.assertContains(response, "not been verified")
 
@@ -390,7 +391,7 @@ class UserTests(TestCase):
         user.save()
 
         # Check authorised user can verify
-        response = self.client.get(reverse('verify', kwargs={'model_id':model.id}),
+        response = self.client.post(reverse('verify', kwargs={'model_id':model.id}),
             follow=True)
         self.assertContains(response, "Verified by {}".format(user.first_name))
 
@@ -399,7 +400,7 @@ class UserTests(TestCase):
         model = create_model(user=user)
 
         # Check unauthorised user can't toggle library status
-        response = self.client.get(reverse('toggle_in_library', kwargs={ 'model_id': model.id }),
+        response = self.client.post(reverse('toggle_in_library', kwargs={ 'model_id': model.id }),
             follow=True)
         self.assertContains(response, "not currently included")
 
@@ -407,7 +408,7 @@ class UserTests(TestCase):
         user.save()
 
         # Check authorised user can toggle library status
-        response = self.client.get(reverse('toggle_in_library', kwargs={ 'model_id': model.id }),
+        response = self.client.post(reverse('toggle_in_library', kwargs={ 'model_id': model.id }),
             follow=True)
         self.assertContains(response, "is included in")
 
@@ -415,18 +416,108 @@ class UserTests(TestCase):
         user = create_user(sign_in=True, client=self.client)
         model = create_model(user=user)
 
-        response = self.client.get(reverse('vote', kwargs={ 'model_id': model.id })
-            + '?vote=up', follow=True)
+        response = self.client.post(reverse('vote', kwargs={ 'model_id': model.id }),
+            { 'vote': 'up' }, follow=True)
         self.assertContains(response, "You cannot vote on your own model")
         self.assertEqual(model.score, 0)
 
         new_user = create_user(sign_in=True, client=self.client)
 
-        response = self.client.get(reverse('vote', kwargs={ 'model_id': model.id })
-            + '?vote=up', follow=True)
+        response = self.client.post(reverse('vote', kwargs={ 'model_id': model.id }),
+            { 'vote': 'up' }, follow=True)
         self.assertContains(response, "Vote successful.")
         model.refresh_from_db()
         self.assertEqual(model.score, 1)
+
+    def test_own_profile_requires_login(self):
+        url = reverse('profile')
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse('login') + '?next=' + url)
+
+        # Other users' profiles stay public
+        other_user = create_user()
+        response = self.client.get(reverse('profile',
+            kwargs={ 'user_id': other_user.id }))
+        self.assertContains(response, other_user.username)
+
+
+class StateChangingActionTests(TestCase):
+    """Actions that change data accept only a POST carrying a CSRF token."""
+
+    def setUp(self):
+        self.owner = create_user()
+        self.owner.is_staff = True
+        self.owner.save()
+        self.model = create_model(user=self.owner)
+        self.model_file = create_file(model=self.model)
+        self.comment = create_comment(user=self.owner, model=self.model)
+        self.actions = [
+            ('vote', { 'model_id': self.model.id }),
+            ('delete', { 'model_id': self.model.id }),
+            ('verify', { 'model_id': self.model.id }),
+            ('toggle_in_library', { 'model_id': self.model.id }),
+            ('delete_file', { 'file_id': self.model_file.id }),
+            ('delete_comment', { 'comment_id': self.comment.id }),
+        ]
+
+    def assertNothingChanged(self):
+        self.model.refresh_from_db()
+        self.assertFalse(self.model.verified)
+        self.assertFalse(self.model.in_library)
+        self.assertTrue(ModelFile.objects.filter(pk=self.model_file.id).exists())
+        self.assertTrue(Comment.objects.filter(pk=self.comment.id).exists())
+        self.assertFalse(Vote.objects.exists())
+
+    def test_get_is_refused(self):
+        self.client.force_login(self.owner)
+        for view, kwargs in self.actions:
+            with self.subTest(view=view):
+                response = self.client.get(reverse(view, kwargs=kwargs)
+                    + '?vote=up')
+                self.assertEqual(response.status_code, 405)
+        self.assertNothingChanged()
+
+    def test_post_without_csrf_token_is_refused(self):
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(self.owner)
+        for view, kwargs in self.actions:
+            with self.subTest(view=view):
+                response = client.post(reverse(view, kwargs=kwargs),
+                    { 'vote': 'up' })
+                self.assertEqual(response.status_code, 403)
+        self.assertNothingChanged()
+
+    def test_anonymous_post_redirects_to_login(self):
+        for view, kwargs in self.actions:
+            with self.subTest(view=view):
+                url = reverse(view, kwargs=kwargs)
+                response = self.client.post(url, { 'vote': 'up' })
+                self.assertRedirects(response, reverse('login') + '?next=' + url,
+                    fetch_redirect_response=False)
+        self.assertNothingChanged()
+
+    def test_buttons_are_forms_with_csrf_token(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse('detail',
+            kwargs={ 'model_id': self.model.id }))
+        for view, kwargs in self.actions:
+            if view in ('vote', 'delete_file'):
+                continue
+            with self.subTest(view=view):
+                self.assertContains(response, '<form action="{}" method="post"'
+                    .format(reverse(view, kwargs=kwargs)))
+        self.assertContains(response, 'csrfmiddlewaretoken')
+
+        response = self.client.get(reverse('edit_files',
+            kwargs={ 'model_id': self.model.id }))
+        self.assertContains(response, '<form action="{}" method="post"'.format(
+            reverse('delete_file', kwargs={ 'file_id': self.model_file.id })))
+
+        self.client.force_login(create_user())
+        response = self.client.get(reverse('detail',
+            kwargs={ 'model_id': self.model.id }))
+        self.assertContains(response, '<form action="{}" method="post"'.format(
+            reverse('vote', kwargs={ 'model_id': self.model.id })))
 
 
 class CommentTests(TestCase):
@@ -485,15 +576,84 @@ class VoteTests(TestCase):
         model = create_model()
         user = create_user(sign_in=True, client=self.client)
 
-        response = self.client.get(reverse('vote', kwargs={ 'model_id': model.id })
-            + '?vote=up', follow=True)
+        response = self.client.post(reverse('vote', kwargs={ 'model_id': model.id }),
+            { 'vote': 'up' }, follow=True)
         model.refresh_from_db()
         self.assertEqual(model.score, 1)
 
-        response = self.client.get(reverse('vote', kwargs={ 'model_id': model.id })
-            + '?vote=down', follow=True)
+        response = self.client.post(reverse('vote', kwargs={ 'model_id': model.id }),
+            { 'vote': 'down' }, follow=True)
         model.refresh_from_db()
         self.assertEqual(model.score, -1)
+        self.assertEqual(Vote.objects.filter(model=model).count(), 1)
+
+    def test_repeated_vote_counts_once(self):
+        model = create_model()
+        create_user(sign_in=True, client=self.client)
+        url = reverse('vote', kwargs={ 'model_id': model.id })
+
+        for i in range(3):
+            self.client.post(url, { 'vote': 'up' })
+        model.refresh_from_db()
+        self.assertEqual(model.score, 1)
+
+    def test_invalid_vote_changes_nothing(self):
+        # An invalid vote used to undo the user's previous vote and then fail,
+        # so repeating it pushed the score up by one each time
+        model = create_model()
+        create_user(sign_in=True, client=self.client)
+        url = reverse('vote', kwargs={ 'model_id': model.id })
+
+        self.client.post(url, { 'vote': 'up' })
+        for data in ({ 'vote': 'bogus' }, {}, { 'vote': 'bogus' }):
+            with self.subTest(data=data):
+                response = self.client.post(url, data)
+                self.assertEqual(response.status_code, 400)
+        self.client.post(url, { 'vote': 'up' })
+
+        model.refresh_from_db()
+        self.assertEqual(model.score, 1)
+        self.assertEqual(Vote.objects.get(model=model).value, 1)
+
+    def test_one_vote_per_user_and_model(self):
+        model = create_model()
+        user = create_user()
+        Vote.objects.create(model=model, user=user, value=1)
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Vote.objects.create(model=model, user=user, value=1)
+
+    def test_score_follows_votes_when_voter_deleted(self):
+        model = create_model()
+        voters = [create_user() for i in range(3)]
+        for user in voters:
+            Vote.objects.create(model=model, user=user, value=1)
+        model.refresh_from_db()
+        self.assertEqual(model.score, 3)
+
+        voters[0].delete()
+        model.refresh_from_db()
+        self.assertEqual(model.score, 2)
+
+    def test_migration_recounts_scores(self):
+        # Migration 0021 recomputes every score from the votes, which repairs
+        # any score pushed up by the old invalid-vote bug
+        from importlib import import_module
+        from django.apps import apps
+        migration = import_module(
+            'marketplace.migrations.0021_vote_unique_per_user_and_model')
+
+        model = create_model()
+        Vote.objects.create(model=model, user=create_user(), value=1)
+        unvoted = create_model()
+        SasviewModel.objects.filter(pk=model.pk).update(score=4)
+        SasviewModel.objects.filter(pk=unvoted.pk).update(score=2)
+
+        migration.remove_duplicate_votes_and_recount(apps, None)
+        model.refresh_from_db()
+        unvoted.refresh_from_db()
+        self.assertEqual(model.score, 1)
+        self.assertEqual(unvoted.score, 0)
 
 class CategoryTests(TestCase):
 
