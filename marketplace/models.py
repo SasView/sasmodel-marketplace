@@ -6,7 +6,9 @@ from django.utils import timezone
 from .backends.database import DatabaseStorage
 from .validators import validate_comma_separated_float_list
 from django.dispatch import receiver
-from django.db.models.signals import pre_delete, post_save
+from django.db.models import OuterRef, Subquery, Sum
+from django.db.models.functions import Coalesce
+from django.db.models.signals import pre_delete, post_save, post_delete
 
 def truncate(string, length):
     if len(string) > length:
@@ -80,6 +82,12 @@ class Vote(models.Model):
     value = models.IntegerField()
     model = models.ForeignKey(SasviewModel, on_delete=models.CASCADE)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'model'],
+                name='unique_vote_per_user_and_model'),
+        ]
+
 class ModelFile(models.Model):
     name = models.CharField(max_length=100)
     model_file = models.FileField(upload_to='uploaded_models',
@@ -112,14 +120,19 @@ def pre_Delete_handler(sender, instance, **kwargs):
     elif sender == ModelFile:
         # Delete file data when a ModelFile instance is deleted
         instance.model_file.delete()
-    elif sender == Vote:
-        # Undo the vote when it's deleted
-        instance.model.score -= instance.value
-        instance.model.save()
 
-@receiver(post_save)
-def post_save_handler(sender, instance, **kwargs):
-    if sender == Vote:
-        # Update the model's score when a vote is made
-        instance.model.score += instance.value
-        instance.model.save()
+def recount_score(model_id):
+    """Set a model's score to the sum of its votes, in a single UPDATE."""
+    total = (Vote.objects.filter(model=OuterRef('pk')).values('model')
+        .annotate(total=Sum('value')).values('total'))
+    SasviewModel.objects.filter(pk=model_id).update(
+        score=Coalesce(Subquery(total), 0))
+
+@receiver(post_save, sender=Vote)
+@receiver(post_delete, sender=Vote)
+def vote_changed_handler(sender, instance, **kwargs):
+    # Recount rather than add or subtract, so no sequence of saves can
+    # leave the score out of step with the votes
+    recount_score(instance.model_id)
+    if Vote.model.is_cached(instance):
+        instance.model.refresh_from_db(fields=['score'])

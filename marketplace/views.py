@@ -3,14 +3,17 @@ from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
 from django.http import HttpResponseServerError
 from django.http import Http404
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
+from django.views.decorators.http import require_POST
 from .forms import SignupForm
 from .forms import SasviewModelForm
 from .forms import ModelFileForm
@@ -149,7 +152,10 @@ def edit(request, model_id):
 
     return render(request, 'marketplace/model_edit.html', { 'form': form })
 
+VOTE_VALUES = {'up': 1, 'down': -1}
+
 @login_required
+@require_POST
 def vote(request, model_id):
     model = get_object_or_404(SasviewModel, pk=model_id)
 
@@ -158,27 +164,19 @@ def vote(request, model_id):
             extra_tags="danger")
         return redirect('detail', model_id)
 
-    vote = Vote.objects.filter(model__id=model_id, user__id=request.user.id).first()
-    if vote is None:
-        vote = Vote(user=request.user, model=model, value=0)
-    else:
-        # User has already voted, undo their last vote
-        vote.value = -vote.value
-        vote.save()
+    value = VOTE_VALUES.get(request.POST.get('vote'))
+    if value is None:
+        return HttpResponseBadRequest("Invalid request. 'vote' must be 'up' or 'down'")
 
-    if request.GET['vote'] == 'up':
-        vote.value = 1
-    elif request.GET['vote'] == 'down':
-        vote.value = -1
-    else:
-        return HttpResponseServerError("Invalid request. 'vote' must be 'up' or 'down'")
-
-    vote.save()
+    # One row per user and model; the score is recounted from the votes on save
+    Vote.objects.update_or_create(user=request.user, model=model,
+        defaults={'value': value})
     messages.success(request, "Vote successful.")
     return redirect('detail', model_id=model_id)
 
 
 @login_required
+@require_POST
 def delete(request, model_id):
     model = check_owned_by_or_admin(request, model_id)
     if not isinstance(model, SasviewModel):
@@ -188,6 +186,7 @@ def delete(request, model_id):
     return redirect('profile')
 
 @login_required
+@require_POST
 def verify(request, model_id):
     if not request.user.is_staff:
         messages.error(request, "You do not have permission to verify this model",
@@ -201,6 +200,7 @@ def verify(request, model_id):
     return redirect('detail', model_id=model.id)
 
 @login_required
+@require_POST
 def toggle_in_library(request, model_id):
     if not request.user.is_staff:
         messages.error(request, "You do not have permission to edit library status",
@@ -241,6 +241,7 @@ def download_file(request, filename):
     return res
 
 @login_required
+@require_POST
 def delete_file(request, file_id):
     model_file = get_object_or_404(ModelFile, pk=file_id)
     model = check_owned_by_or_admin(request, model_file.model.id)
@@ -275,6 +276,7 @@ def edit_files(request, model_id):
 # Comment views
 
 @login_required
+@require_POST
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
     if comment.user != request.user:
@@ -306,6 +308,9 @@ def sign_up(request):
 
 def profile(request, user_id=None):
     if user_id is None:
+        # Your own profile needs a login; other users' profiles are public
+        if not request.user.is_authenticated:
+            return redirect_to_login(request.get_full_path())
         user_id = request.user.id
     user = get_object_or_404(User, pk=user_id)
     all_models = SasviewModel.objects.filter(owner__pk=user.id).order_by('-upload_date')

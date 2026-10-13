@@ -109,8 +109,11 @@
         <td>{{ model.score }}
         {% if request.user.is_authenticated and request.user != model.owner %}
         <div class="pull-right">
-            <a href="{% url 'vote' model_id=model.id %}?vote=up" class="btn btn-success btn-xs">{% bootstrap_icon 'thumbs-up' %} Upvote</a>
-            <a href="{% url 'vote' model_id=model.id %}?vote=down" class="btn btn-danger btn-xs">{% bootstrap_icon 'thumbs-down' %} Downvote</a>
+            <form action="{% url 'vote' model_id=model.id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" name="vote" value="up" class="btn btn-success btn-xs">{% bootstrap_icon 'thumbs-up' %} Upvote</button>
+                <button type="submit" name="vote" value="down" class="btn btn-danger btn-xs">{% bootstrap_icon 'thumbs-down' %} Downvote</button>
+            </form>
         </div>
         {% endif %}
         </td>
@@ -173,7 +176,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <a type="button" class="btn btn-danger" href="#" id="modal-del-btn">Delete</a>
+        <form action="{% url 'delete' model_id=model.id %}" method="post" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
       </div>
     </div>
   </div>
@@ -181,27 +187,30 @@
 
 <script type="text/javascript">
     $('.delete-btn').click(function(event) {
-        modelName = "{{ model.name }}";
-        deleteUrl = "{% url 'delete' model_id=model.id %}";
+        var modelName = "{{ model.name|escapejs }}";
         $('#del-modal-content').text("Are you sure you want to delete " + modelName + "?");
-        $('#modal-del-btn').attr('href', deleteUrl);
     });
 </script>
 {% endif %}
 
 {% if request.user.is_staff %}
 <div>
+    <form action="{% url 'verify' model_id=model.id %}" method="post" style="display: inline;">
+        {% csrf_token %}
     {% if model.verified == False %}
-        <a href="{% url 'verify' model_id=model.id %}" class="btn btn-success">{% bootstrap_icon 'ok' %} Verify</a>
+        <button type="submit" class="btn btn-success">{% bootstrap_icon 'ok' %} Verify</button>
     {% else %}
-        <a href="{% url 'verify' model_id=model.id %}" class="btn btn-danger">{% bootstrap_icon 'remove' %} Un-Verify</a>
+        <button type="submit" class="btn btn-danger">{% bootstrap_icon 'remove' %} Un-Verify</button>
     {% endif %}
+    </form>
+    <form action="{% url 'toggle_in_library' model_id=model.id %}" method="post" style="display: inline;">
+        {% csrf_token %}
     {% if model.in_library == False %}
-        <a href="{% url 'toggle_in_library' model_id=model.id %}" class="btn btn-success">{% bootstrap_icon 'book' %} Add to Library</a>
+        <button type="submit" class="btn btn-success">{% bootstrap_icon 'book' %} Add to Library</button>
     {% else %}
-        <a href="{% url 'toggle_in_library' model_id=model.id %}" class="btn btn-danger">{% bootstrap_icon 'book' %} Remove from Library</a>
+        <button type="submit" class="btn btn-danger">{% bootstrap_icon 'book' %} Remove from Library</button>
     {% endif %}
-
+    </form>
 </div>
 {% endif %}
 
@@ -222,7 +231,10 @@
             </div>
             {% if comment.user == request.user %}
             <div class="actions">
-                    <a class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Delete comment" href="{% url 'delete_comment' comment_id=comment.id %}">{% bootstrap_icon 'remove' %}</a>
+                <form action="{% url 'delete_comment' comment_id=comment.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="right" title="Delete comment">{% bootstrap_icon 'remove' %}</button>
+                </form>
             </div>
             {% endif %}
         </div>

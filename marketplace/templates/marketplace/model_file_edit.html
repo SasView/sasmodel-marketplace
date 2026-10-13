@@ -20,7 +20,10 @@
                 <td>
                     <a href="{% url 'show_file' file_id=f.id %}" class="btn btn-default">{% bootstrap_icon "zoom-in" %} View</a>
                     <a href="{% url 'download_file' filename=f.model_file.name %}" class="btn btn-primary">{% bootstrap_icon "download" %} Download</a>
-                    <a href="{% url 'delete_file' file_id=f.id %}" class="btn btn-danger">{% bootstrap_icon "remove-circle" %} Delete</a>
+                    <form action="{% url 'delete_file' file_id=f.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">{% bootstrap_icon "remove-circle" %} Delete</button>
+                    </form>
                 </td>
             </tr>
         {% endfor %}
