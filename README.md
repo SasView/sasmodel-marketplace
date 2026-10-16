@@ -28,7 +28,7 @@ database itself (`marketplace.backends.database.DatabaseStorage`), not on disk.
 
 ## Local development
 
-Requires Python 3.8 (what production runs) and a MySQL server.
+Requires Python 3.12 (what production and CI run) and a MySQL server.
 
 1. Create a database and user matching `sasmarket/settings.py.example`, or edit the copy you make
    in step 3:
